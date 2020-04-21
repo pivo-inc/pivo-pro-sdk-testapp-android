@@ -1,0 +1,2 @@
+rootProject.name='PivoProSDKTestApp'
+include ':app'
