@@ -1,3 +1,32 @@
 <resources>
-    <string name="app_name">PivoProSDKTestApp</string>
+    <string name="app_name">PivoSDK Test App</string>
+
+    <!-- Scan -->
+    <string name="action_scan">SCAN</string>
+    <string name="action_stop">STOP</string>
+    <!-- Device -->
+    <string name="device_search_msg">There are multiple devices.  Find your device.</string>
+
+    <string name="nearby_devices">Nearby  devices</string>
+    <string name="no_device_found">No device found</string>
+    <string name="searching_for_new_device">Searching for new device</string>
+    <string name="none">None</string>
+    <string name="loading">loading</string>
+    <string name="scan">Scan</string>
+    <string name="cancel">Cancel</string>
+    <string name="connecting">Connecting</string>
+    <string name="ble_failed_connection">Failed to connect to the selected device</string>
+    <string name="approve_your_device">Approve your device</string>
+    <string name="unnamed">unnamed</string>
+    <string name="ble_connected_to_device" formatted="false">Connected to %s.  Is your device rotating now?</string>
+    <string name="yes_save_it">Yes, save it!</string>
+    <string name="no_scan_again">No, scan again</string>
+    <string name="rotate_again">Rotate again</string>
+    <string name="try_to_connect">Reconnecting</string>
+    <string name="sdk_try_again">Try again</string>
+
+    <string name="lleft"><![CDATA[<<]]></string>
+    <string name="left"><![CDATA[<]]></string>
+    <string name="right"><![CDATA[>]]></string>
+    <string name="rright"><![CDATA[>>]]></string>
 </resources>

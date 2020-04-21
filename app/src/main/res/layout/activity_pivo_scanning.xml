@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="app.pivo.android.basicsdkdemo.basic.PivoScanningActivity">
+
+    <TextView
+        android:layout_marginTop="40dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginBottom="10dp"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:drawablePadding="5dp"
+        android:gravity="center"
+        android:text="@string/device_search_msg"
+        android:textColor="@color/textColorSecondary"
+        android:textSize="18dp"
+        android:textStyle="bold" />
+
+    <Button
+        android:layout_marginRight="20dp"
+        android:layout_marginLeft="20dp"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/textView2"
+        android:id="@+id/scan_button"
+        style="@style/PrimaryButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/colorBgSecondary"
+        android:drawableTint="@color/background_grey"
+        android:text="@string/scan"
+        android:textColor="@color/white" />
+
+    <Button
+        android:layout_marginRight="20dp"
+        android:layout_marginLeft="20dp"
+        android:layout_below="@+id/textView2"
+        android:layout_alignParentRight="true"
+        android:id="@+id/cancel_button"
+        style="@style/PrimaryButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/colorBgSecondary"
+        android:drawableTint="@color/background_grey"
+        android:text="@string/cancel"
+        android:textColor="@color/white" />
+
+    <TextView
+        android:layout_marginRight="20dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_below="@+id/scan_button"
+        android:id="@+id/scan_info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/nearby_devices"
+        android:textColor="@color/text" />
+
+    <ProgressBar
+        android:visibility="invisible"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="22dp"
+        android:layout_below="@+id/scan_button"
+        android:layout_toRightOf="@+id/scan_info"
+        android:id="@+id/scanning_bar"
+        style="@android:style/Widget.DeviceDefault.Light.ProgressBar.Small"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_margin="20dp"
+        android:layout_below="@+id/scan_info"
+        android:id="@+id/scan_results"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="5dp"
+        android:minHeight="200dp"
+        android:scrollbars="vertical"/>
+
+</RelativeLayout>
