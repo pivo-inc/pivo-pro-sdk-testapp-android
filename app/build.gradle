@@ -31,7 +31,6 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
-
 }
 
 dependencies {
@@ -66,12 +65,14 @@ dependencies {
      */
     implementation 'com.polidea.rxandroidble:rxandroidble:1.5.0'
 
-    compile(name: 'prosdk-release', ext: 'aar')
+    implementation 'app.pivo.android.prosdk:PivoProSdk:1.0.0-alpha1'
 
     /**
      * Tensorflow module
      */
     implementation 'org.tensorflow:tensorflow-lite:1.13.1'
+
+    implementation 'com.google.android.material:material:1.2.0-alpha06'
 
     /**
      * Unit testing dependencies

@@ -9,39 +9,69 @@ import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import app.pivo.android.prosdk.PivoProSdk
+import app.pivo.android.prosdk.PivoSensitivity
 import app.pivo.android.prosdk.tracking.FrameMetadata
 import app.pivo.android.prosdk.util.ITrackingListener
 import app.pivo.android.prosdkdemo.camera.*
 import kotlinx.android.synthetic.main.activity_camera.*
 import kotlin.math.min
 
-class CameraActivity : AppCompatActivity(), ICameraCallback, View.OnClickListener {
+class CameraActivity : AppCompatActivity(), ICameraCallback {
     private var tracking:Tracking = Tracking.NONE
+    private var sensitivity:PivoSensitivity = PivoSensitivity.NONE
     private lateinit var cameraController: CameraController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_camera)
 
-        picture.setOnClickListener {
-//            cameraController.takePicture()
-        }
 
         switch_camera_view.setOnClickListener {
-            personStarted = false
-            actionStarted = false
-            PivoProSdk.getInstance().stopTracking()
+            trackingStarted = false
+            PivoProSdk.getInstance().stop()
             cameraController.switchCamera()
         }
 
-        btn_cntrl_tracking.setOnClickListener (this)
+        toggle_btn_tracking?.addOnButtonCheckedListener { group, checkedId, isChecked ->
+            if (isChecked){
+                when(checkedId){
+                    R.id.none_tr ->{
+                        tracking = Tracking.NONE
+                    }
+                    R.id.action_tr ->{
+                        tracking = Tracking.ACTION
+                    }
+                    R.id.person_tr ->{
+                        tracking = Tracking.PERSON
+                    }
+                    R.id.horse_tr ->{
+                        tracking = Tracking.HORSE
+                    }
+                }
+            }
+            restart()
+            updateUI()
+        }
 
-        btn_action_view.setOnClickListener(this)
-
-        btn_off_view.setOnClickListener (this)
-
-        btn_person_view.setOnClickListener (this)
-
+        toggle_btn_sensitivity?.addOnButtonCheckedListener { group, checkedId, isChecked ->
+            if (isChecked){
+                when(checkedId){
+                    R.id.none_sen ->{
+                        sensitivity = PivoSensitivity.NONE
+                    }
+                    R.id.slow_sen ->{
+                        sensitivity = PivoSensitivity.SLOW
+                    }
+                    R.id.normal_sen ->{
+                        sensitivity = PivoSensitivity.NORMAL
+                    }
+                    R.id.fast_sen ->{
+                        sensitivity = PivoSensitivity.FAST
+                    }
+                }
+                restart()
+            }
+        }
         //create [CameraController] object
         cameraController = CameraController(this, texture)
 
@@ -49,34 +79,13 @@ class CameraActivity : AppCompatActivity(), ICameraCallback, View.OnClickListene
         tracking_graphic_overlay.setListener(actionSelectListener)
     }
 
-    private var listShown = false
-    override fun onClick(view: View?) {
-        when(view!!.id){
-            R.id.btn_cntrl_tracking->{
-                if (listShown){
-                    closeSlidingMenu()
-                }
-                listShown = true
-                ViewManager.slideShow(this, btn_off_view, btn_person_view, btn_action_view)
-                return
-            }
-            R.id.btn_action_view->{
-                tracking = Tracking.ACTION
-                updateTracking()
-            }
-            R.id.btn_person_view->{
-                tracking = Tracking.PERSON
-                updateTracking()
-            }
-            R.id.btn_off_view->{
-                tracking = Tracking.NONE
-                updateTracking()
-            }
+    private fun restart(){
+        trackingStarted = false
+
+        if (tracking == Tracking.ACTION){
+            region = null
+            updateUI()
         }
-        if (listShown){
-            closeSlidingMenu()
-        }
-        updateTrackingUI()
     }
 
     override fun onResume() {
@@ -91,11 +100,11 @@ class CameraActivity : AppCompatActivity(), ICameraCallback, View.OnClickListene
         super.onPause()
     }
 
-    private fun updateTracking(){
+    private fun updateUI(){
         tracking_graphic_overlay.setTrackingMethod(tracking)
 
         val handler = Handler()
-        handler.postDelayed(Runnable {
+        handler.postDelayed({
             tracking_graphic_overlay.clear()
         }, 500)
     }
@@ -108,8 +117,7 @@ class CameraActivity : AppCompatActivity(), ICameraCallback, View.OnClickListene
         finish()
     }
 
-    private var personStarted = false
-    private var actionStarted = false
+    private var trackingStarted = false
     private var frontCamera = false
     override fun onProcessingFrame(image: Image, width:Int, height:Int, orientation:Int, frontCamera:Boolean) {
         this.frontCamera = frontCamera
@@ -137,35 +145,43 @@ class CameraActivity : AppCompatActivity(), ICameraCallback, View.OnClickListene
 
         when(tracking){//person
             Tracking.PERSON->{
-                actionStarted = false
-                if (!personStarted){
-                    PivoProSdk.getInstance().starPersonTracking(metadata, image, personTrackerListener)
-                    personStarted = true
+                if (!trackingStarted){
+                    PivoProSdk.getInstance().starPersonTracking(metadata, image, sensitivity , personTrackerListener)
+                    trackingStarted = true
                 }else{
                     PivoProSdk.getInstance().updateTrackingFrame(image, metadata)
                 }
             }
             Tracking.ACTION->{//action
-                personStarted = false
-                if (region!=null && !actionStarted){
-                    PivoProSdk.getInstance().startActionTracking(metadata, region, image, actionTrackerListener)
+                if (region!=null && !trackingStarted){
+                    PivoProSdk.getInstance().startActionTracking(metadata, region, image, sensitivity, actionTrackerListener)
                     region = null
-                    actionStarted = true
+                    trackingStarted = true
                 }else{
-                    if (actionStarted){
+                    if (trackingStarted){
                         PivoProSdk.getInstance().updateTrackingFrame(image, metadata)
                     }else{
                         image.close()
                     }
                 }
             }
+            Tracking.HORSE->{
+                if (!trackingStarted){
+                    PivoProSdk.getInstance().startHorseTracking(metadata, image, sensitivity, actionTrackerListener)
+                    region = null
+                    trackingStarted = true
+                }else {
+                    PivoProSdk.getInstance().updateTrackingFrame(image, metadata)
+                }
+            }
             else -> {
                 image.close()
-                personStarted = false
+                trackingStarted = false
                 region = null
             }
         }
     }
+
     // action tracking drawing region
     private var region:Rect?=null
     // action drawing callback
@@ -178,7 +194,7 @@ class CameraActivity : AppCompatActivity(), ICameraCallback, View.OnClickListene
             // reset tracking area selector variable
             tracking_graphic_overlay.reset()
             // set tracking region
-            actionStarted = false
+            trackingStarted = false
             region = objRegion
         }
     }
@@ -228,45 +244,6 @@ class CameraActivity : AppCompatActivity(), ICameraCallback, View.OnClickListene
 
         override fun onClear() {}
     }
-
-    private fun closeSlidingMenu() {
-        ViewManager.slideHide(true, btn_off_view, btn_person_view, btn_action_view)
-        listShown = false
-    }
-
-    private fun updateTrackingUI(){
-        when(tracking){
-//            Tracking.NONE->{
-//                btn_cntrl_tracking.setImageResource(R.mipmap.ic_gps_on)
-//
-//                btn_action_view.setColorFilter(resources.getColor(R.color.transparent))
-//                btn_person_view.setImageResource(R.mipmap.ic_body_off)
-//                btn_off_view.setColorFilter(resources.getColor(R.color.pivo_color))
-//            }
-//            Tracking.PERSON->{
-//                btn_cntrl_tracking.setImageResource(R.mipmap.ic_body_on)
-//
-//                btn_person_view.setImageResource(R.mipmap.ic_body_on)
-//                btn_action_view.setColorFilter(resources.getColor(R.color.transparent))
-//                btn_off_view.setColorFilter(resources.getColor(R.color.transparent))
-//            }
-//            Tracking.HORSE->{
-//                btn_cntrl_tracking.setImageResource(R.mipmap.ic_horse_on)
-//
-//                btn_action_view.setColorFilter(resources.getColor(R.color.transparent))
-//                btn_person_view.setImageResource(R.mipmap.ic_body_off)
-//                btn_off_view.setColorFilter(resources.getColor(R.color.transparent))
-//            }
-//            Tracking.ACTION->{
-//                btn_cntrl_tracking.setImageResource(R.mipmap.ic_object_tracking_inactive)
-//
-//                btn_person_view.setImageResource(R.mipmap.ic_body_off)
-//                btn_action_view.setColorFilter(resources.getColor(R.color.pivo_color))
-//                btn_off_view.setColorFilter(resources.getColor(R.color.transparent))
-//            }
-        }
-    }
-
     /**
      * This function is called to match aspect ratio
      */

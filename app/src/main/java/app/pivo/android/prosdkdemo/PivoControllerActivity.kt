@@ -1,5 +1,6 @@
 package app.pivo.android.prosdkdemo
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -47,6 +48,10 @@ class PivoControllerActivity : AppCompatActivity() {
             if (input_pivo_name.text.isNotEmpty()){
                 PivoProSdk.getInstance().changeName(input_pivo_name.text.toString())
             }
+        }
+
+        btn_camera.setOnClickListener {
+            startActivity(Intent(this, CameraActivity::class.java))
         }
 
         //get Pivo supported speed list
@@ -123,5 +128,12 @@ class PivoControllerActivity : AppCompatActivity() {
         super.onPause()
         //unregister before stopping the activity
         PivoEventBus.unregister(this)
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+
+        PivoProSdk.getInstance().disconnect()
+        finish()
     }
 }

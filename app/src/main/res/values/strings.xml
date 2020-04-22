@@ -24,9 +24,11 @@
     <string name="rotate_again">Rotate again</string>
     <string name="try_to_connect">Reconnecting</string>
     <string name="sdk_try_again">Try again</string>
+    <string name="picture">Picture</string>
 
     <string name="lleft"><![CDATA[<<]]></string>
     <string name="left"><![CDATA[<]]></string>
     <string name="right"><![CDATA[>]]></string>
     <string name="rright"><![CDATA[>>]]></string>
+    <string name="camera">Go camera</string>
 </resources>

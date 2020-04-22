@@ -157,5 +157,16 @@
         app:layout_constraintEnd_toStartOf="@+id/right_guideline"
         app:layout_constraintStart_toStartOf="@+id/left_guideline" />
 
+    <Button
+        android:id="@+id/btn_camera"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/camera"
+        app:layout_constraintEnd_toStartOf="@+id/right_guideline"
+        app:layout_constraintStart_toStartOf="@+id/left_guideline"
+        app:layout_constraintTop_toBottomOf="@+id/input_pivo_name" />
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

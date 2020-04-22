@@ -63,8 +63,7 @@ class PivoScanningActivity : AppCompatActivity() {
             scanning_bar.visibility = View.INVISIBLE
             if (it is PivoEvent.ConnectionComplete){
                 Log.e(TAG, "CONNECTION_COMPLETED: ${it.version}")
-//                openController()
-                openCamera()
+                openController()
             }
         })
         //subscribe to get scan device
@@ -87,10 +86,6 @@ class PivoScanningActivity : AppCompatActivity() {
         startActivity(Intent(this, PivoControllerActivity::class.java))
     }
 
-    private fun openCamera(){
-        startActivity(Intent(this, CameraActivity::class.java))
-    }
-
     //check permissions if they're granted start scanning, otherwise ask to user to grant permissions
     private fun checkPermission(){// alternative Permission library Dexter
         Permissions.check(this,
@@ -107,5 +102,6 @@ class PivoScanningActivity : AppCompatActivity() {
         Manifest.permission.ACCESS_FINE_LOCATION,
         Manifest.permission.ACCESS_COARSE_LOCATION,
         Manifest.permission.BLUETOOTH,
-        Manifest.permission.BLUETOOTH_ADMIN)
+        Manifest.permission.BLUETOOTH_ADMIN,
+        Manifest.permission.CAMERA)
 }

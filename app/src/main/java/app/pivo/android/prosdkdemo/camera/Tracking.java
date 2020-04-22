@@ -1,12 +1,9 @@
 package app.pivo.android.prosdkdemo.camera;
 
 public enum Tracking {
-    FACE(1),
-    ACTION(2),
-    PERSON(3),
-    DOG(4),
-    CAT(5),
-    HORSE(6),
+    ACTION(1),
+    PERSON(2),
+    HORSE(3),
     NONE(0),
     INITIAL(-1);
     int type;
@@ -17,3 +14,4 @@ public enum Tracking {
         return type;
     }
 }
+
