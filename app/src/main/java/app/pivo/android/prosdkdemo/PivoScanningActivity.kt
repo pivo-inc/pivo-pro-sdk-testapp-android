@@ -62,7 +62,7 @@ class PivoScanningActivity : AppCompatActivity() {
             PivoEventBus.CONNECTION_COMPLETED, this, Consumer {
             scanning_bar.visibility = View.INVISIBLE
             if (it is PivoEvent.ConnectionComplete){
-                Log.e(TAG, "CONNECTION_COMPLETED: ${it.version}")
+                Log.e(TAG, "CONNECTION_COMPLETED")
                 openController()
             }
         })

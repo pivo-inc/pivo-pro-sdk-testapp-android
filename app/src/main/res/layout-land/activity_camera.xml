@@ -47,7 +47,7 @@
             android:layout_width="wrap_content"
             android:layout_centerVertical="true"
             app:singleSelection="true"
-            app:selectionRequired="true"
+            app:checkedButton="@+id/none_tr"
             android:orientation="vertical"
             android:layout_height="wrap_content">
             <Button
@@ -89,7 +89,7 @@
             android:layout_toRightOf="@id/toggle_btn_tracking"
             android:orientation="vertical"
             app:singleSelection="true"
-            app:selectionRequired="true"
+            app:checkedButton="@+id/normal_sen"
             android:layout_height="wrap_content">
             <Button
                 android:id="@+id/none_sen"

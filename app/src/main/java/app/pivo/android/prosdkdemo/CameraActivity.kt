@@ -18,7 +18,7 @@ import kotlin.math.min
 
 class CameraActivity : AppCompatActivity(), ICameraCallback {
     private var tracking:Tracking = Tracking.NONE
-    private var sensitivity:PivoSensitivity = PivoSensitivity.NONE
+    private var sensitivity:PivoSensitivity = PivoSensitivity.NORMAL
     private lateinit var cameraController: CameraController
 
     override fun onCreate(savedInstanceState: Bundle?) {
