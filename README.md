@@ -21,7 +21,7 @@ allprojects {
 
 ```groovy
 dependencies {
- implementation 'app.pivo.android.prosdk:PivoProSdk:1.0.0-alpha4'
+ implementation 'app.pivo.android.prosdk:PivoProSdk:1.0.0-alpha5'
  implementation 'com.polidea.rxandroidble:rxandroidble:1.5.0'
  /**
   * RxJava dependencies
@@ -75,11 +75,46 @@ if (region!=null && !trackingStarted){
 //...
 }
 ```
+or
+```kotlin
+override fun onProcessingFrame (image: ByteArray, width:Int, height:Int,
+ orientation:Int, frontCamera:Boolean) {
+//...
+if (region!=null && !trackingStarted){
+    PivoProSdk.getInstance().startActionTracking(metadata, region, image, sensitivity, actionTrackerListener)
+    region = null
+    trackingStarted = true
+ }else{
+  if (trackingStarted){
+    PivoProSdk.getInstance().updateTrackingFrame(image, metadata)
+  }
+ }
+//...
+}
+```
 
 ### Person/Horse Tracking:
 
 ```kotlin
 override fun onProcessingFrame (image: Image, width:Int, height:Int,
+ orientation:Int, frontCamera:Boolean) {
+//...
+if (!trackingStarted){
+//PivoProSdk.getInstance().starPersonTracking(metadata, image, sensitivity , aiTrackerListener) // For person tracking
+  PivoProSdk.getInstance().startHorseTracking(metadata, image,sensitivity, aiTrackerListener) // For horse tracking
+  region = null
+  trackingStarted = true
+  }else {
+    PivoProSdk.getInstance().updateTrackingFrame(image, metadata)
+    }
+  }
+//...
+}
+```
+or 
+
+```kotlin
+override fun onProcessingFrame (image: ByteArray, width:Int, height:Int,
  orientation:Int, frontCamera:Boolean) {
 //...
 if (!trackingStarted){
