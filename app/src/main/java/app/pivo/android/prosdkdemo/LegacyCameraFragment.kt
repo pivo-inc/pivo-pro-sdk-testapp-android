@@ -25,7 +25,7 @@ class LegacyCameraFragment : CameraBaseFragment() {
     /** Conversion from screen rotation to JPEG orientation.  */
     private val ORIENTATIONS = SparseIntArray()
 
-    private var isFrontCamera = false
+    private var isFrontCamera = true
 
     private lateinit var camera: Camera
     private var imageListener: Camera.PreviewCallback? = Camera.PreviewCallback() { bytes: ByteArray, camera: Camera ->
@@ -73,6 +73,8 @@ class LegacyCameraFragment : CameraBaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        Log.e(TAG, "onViewCreated")
 
         ORIENTATIONS.append(Surface.ROTATION_0, 90)
         ORIENTATIONS.append(Surface.ROTATION_90, 0)

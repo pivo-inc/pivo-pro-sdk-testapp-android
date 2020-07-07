@@ -20,6 +20,10 @@ class PivoControllerActivity : AppCompatActivity() {
 
     private val TAG = "PivoControllerActivity"
 
+    companion object{
+        val CAMERA_TYPE_MSG_CODE = "CAMERA_TYPE_MSG_CODE"
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_pivo_controller)
@@ -50,8 +54,16 @@ class PivoControllerActivity : AppCompatActivity() {
             }
         }
 
-        btn_camera.setOnClickListener {
-            startActivity(Intent(this, CameraActivity::class.java))
+        btn_camera1.setOnClickListener {
+            val intent = Intent(this, CameraActivity::class.java)
+            intent.putExtra(CAMERA_TYPE_MSG_CODE, 1)
+            startActivity(intent)
+        }
+
+        btn_camera2.setOnClickListener {
+            val intent = Intent(this, CameraActivity::class.java)
+            intent.putExtra(CAMERA_TYPE_MSG_CODE, 2)
+            startActivity(intent)
         }
 
         //get Pivo supported speed list

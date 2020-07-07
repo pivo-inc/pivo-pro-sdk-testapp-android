@@ -158,15 +158,23 @@
         app:layout_constraintStart_toStartOf="@+id/left_guideline" />
 
     <Button
-        android:id="@+id/btn_camera"
+        android:id="@+id/btn_camera1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="@string/camera"
+        android:text="@string/camera1"
         app:layout_constraintEnd_toStartOf="@+id/right_guideline"
         app:layout_constraintStart_toStartOf="@+id/left_guideline"
         app:layout_constraintTop_toBottomOf="@+id/input_pivo_name" />
 
-
+    <Button
+        android:id="@+id/btn_camera2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/camera2"
+        app:layout_constraintEnd_toStartOf="@+id/right_guideline"
+        app:layout_constraintStart_toStartOf="@+id/left_guideline"
+        app:layout_constraintTop_toBottomOf="@+id/btn_camera1" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

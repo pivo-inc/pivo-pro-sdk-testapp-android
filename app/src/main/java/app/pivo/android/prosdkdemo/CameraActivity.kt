@@ -7,8 +7,6 @@ import app.pivo.android.sdkdemo.pro.LegacyCameraFragment
 
 class CameraActivity : AppCompatActivity() {
 
-    private var useCamera2API = false
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_camera)
@@ -17,7 +15,8 @@ class CameraActivity : AppCompatActivity() {
     }
 
     private fun setFragment() {
-        val fragment = if (useCamera2API) {
+        val cameraApi = intent.getIntExtra(PivoControllerActivity.CAMERA_TYPE_MSG_CODE, 1)
+        val fragment = if (cameraApi == 2) {
             Camera2Fragment()
         } else {
             LegacyCameraFragment()

@@ -30,5 +30,6 @@
     <string name="left"><![CDATA[<]]></string>
     <string name="right"><![CDATA[>]]></string>
     <string name="rright"><![CDATA[>>]]></string>
-    <string name="camera">Go camera</string>
+    <string name="camera1">Go camera 1</string>
+    <string name="camera2">Go camera 2</string>
 </resources>
