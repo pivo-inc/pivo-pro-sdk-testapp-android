@@ -1,6 +1,7 @@
 package app.pivo.android.prosdkdemo.util
 
 import android.graphics.Bitmap
+import android.media.Image
 import android.os.Environment
 import android.util.Log
 import java.io.File
@@ -31,6 +32,25 @@ object ImageUtils {
         val uvSize = (width + 1) / 2 * ((height + 1) / 2) * 2
         return ySize + uvSize
     }
+
+    fun convertYUV420888ToNV21(imgYUV420: Image): ByteArray? {
+        // Converting YUV_420_888 data to NV21.
+        return try {
+            val data: ByteArray
+            val buffer0 = imgYUV420.planes[0].buffer
+            val buffer2 = imgYUV420.planes[2].buffer
+            val buffer0_size = buffer0.remaining()
+            val buffer2_size = buffer2.remaining()
+            data = ByteArray(buffer0_size + buffer2_size)
+            buffer0[data, 0, buffer0_size]
+            buffer2[data, buffer0_size, buffer2_size]
+            data
+        } catch (e: IllegalStateException) {
+            e.printStackTrace()
+            null
+        }
+    }
+
     /**
      * Saves a Bitmap object to disk for analysis.
      *

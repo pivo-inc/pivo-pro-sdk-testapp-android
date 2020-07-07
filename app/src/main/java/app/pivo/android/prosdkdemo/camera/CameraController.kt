@@ -19,6 +19,7 @@ import android.view.OrientationEventListener
 import android.view.Surface
 import android.view.TextureView
 import androidx.core.content.ContextCompat
+import app.pivo.android.prosdkdemo.util.ImageUtils
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -163,7 +164,13 @@ class CameraController(
      */
     private val onFrameAvailableListener = ImageReader.OnImageAvailableListener {
         val image = it.acquireLatestImage() ?: return@OnImageAvailableListener
-        listener?.onProcessingFrame(image, frameSize!!.width, frameSize!!.height, getTrackingFrameRotation()/90, isFrontCamera())
+
+        // note: Please use the below code to use image format api
+        //listener?.onProcessingFrame(image, frameSize!!.width, frameSize!!.height, getTrackingFrameRotation()/90, isFrontCamera())
+
+        // note: Please use the below code to use byteArray api
+        listener?.onProcessingFrame(ImageUtils.convertYUV420888ToNV21(image)!!, frameSize!!.width, frameSize!!.height, getTrackingFrameRotation()/90, isFrontCamera())
+        image.close()
     }
 
     /**

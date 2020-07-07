@@ -10,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import app.pivo.android.prosdk.ImageUtils
 import app.pivo.android.prosdk.PivoProSdk
 import app.pivo.android.prosdk.PivoSensitivity
 import app.pivo.android.prosdk.tracking.FrameMetadata
