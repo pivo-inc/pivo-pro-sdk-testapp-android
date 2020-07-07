@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ Copyright 2014 The Android Open Source Project
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+     http://www.apache.org/licenses/LICENSE-2.0
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<RelativeLayout
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <app.pivo.android.prosdkdemo.camera.AutoFitTextureView
+        android:id="@+id/texture"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true" />
+
+    <app.pivo.android.prosdkdemo.camera.GraphicOverlay
+        android:id="@+id/tracking_graphic_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+    <RelativeLayout
+        android:id="@+id/control"
+        android:layout_alignParentRight="true"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent">
+
+        <com.google.android.material.button.MaterialButtonToggleGroup
+            android:id="@+id/toggle_btn_tracking"
+            android:layout_width="wrap_content"
+            android:layout_centerVertical="true"
+            app:singleSelection="true"
+            app:selectionRequired="true"
+            android:orientation="vertical"
+            android:layout_height="wrap_content">
+            <Button
+                android:id="@+id/none_tr"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="None"
+                style="?attr/materialButtonOutlinedStyle"
+                />
+            <Button
+                android:id="@+id/action_tr"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Object"
+                style="?attr/materialButtonOutlinedStyle"
+                />
+            <Button
+                android:id="@+id/person_tr"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Person"
+                style="?attr/materialButtonOutlinedStyle"
+                />
+            <Button
+                android:id="@+id/horse_tr"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Horse"
+                style="?attr/materialButtonOutlinedStyle"
+                />
+
+        </com.google.android.material.button.MaterialButtonToggleGroup>
+
+
+        <com.google.android.material.button.MaterialButtonToggleGroup
+            android:id="@+id/toggle_btn_sensitivity"
+            android:layout_width="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@id/toggle_btn_tracking"
+            android:orientation="vertical"
+            app:singleSelection="true"
+            app:checkedButton="@+id/normal_sen"
+            android:layout_height="wrap_content">
+            <Button
+                android:id="@+id/none_sen"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="None"
+                style="?attr/materialButtonOutlinedStyle"
+                />
+            <Button
+                android:id="@+id/slow_sen"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Slow"
+                style="?attr/materialButtonOutlinedStyle"
+                />
+            <Button
+                android:id="@+id/normal_sen"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Normal"
+                style="?attr/materialButtonOutlinedStyle"
+                />
+            <Button
+                android:id="@+id/fast_sen"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Fast"
+                style="?attr/materialButtonOutlinedStyle"
+                />
+        </com.google.android.material.button.MaterialButtonToggleGroup>
+
+    </RelativeLayout>
+
+    <ImageButton
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="10dp"
+        android:id="@+id/switch_camera_view"
+        android:background="@color/transparent"
+        android:src="@mipmap/ic_flip_camera"
+        android:padding="10dp"
+        android:layout_alignParentLeft="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+</RelativeLayout>

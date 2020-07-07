@@ -35,12 +35,11 @@ import kotlin.math.min
  */
 class CameraController(
     private var context: Context,
+    private var listener:ICameraCallback,
     /**
      * An [AutoFitTextureView] for camera preview.
      */
     private var textureView: AutoFitTextureView) {
-
-    private var listener:ICameraCallback? = null
 
     /**
      * [TextureView.SurfaceTextureListener] handles several lifecycle events on a
@@ -965,9 +964,5 @@ class CameraController(
             degrees = -degrees
         }
         return (characteristics!!.get(CameraCharacteristics.SENSOR_ORIENTATION)!! + degrees + 360) % 360
-    }
-
-    init {
-        listener = context as ICameraCallback
     }
 }

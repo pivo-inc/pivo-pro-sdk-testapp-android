@@ -10,4 +10,5 @@ interface ICameraCallback {
     fun onCameraError()
     fun onCameraDisconnect()
     fun onProcessingFrame(image: Image, width:Int, height:Int, orientation:Int, frontCamera:Boolean)
+    fun onProcessingFrame(byteArray: ByteArray, width:Int, height:Int, orientation:Int, frontCamera:Boolean)
 }
