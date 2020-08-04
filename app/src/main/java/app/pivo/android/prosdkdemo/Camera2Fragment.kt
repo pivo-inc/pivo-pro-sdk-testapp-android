@@ -3,6 +3,8 @@ package app.pivo.android.prosdkdemo
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import app.pivo.android.prosdk.PivoAuthentication
+import app.pivo.android.prosdk.PivoProSdk
 import app.pivo.android.prosdkdemo.camera.CameraController
 import kotlinx.android.synthetic.main.fragment_camera_base.*
 
