@@ -12,16 +12,14 @@ Please visit [Pivo developer website](https://developer.pivo.app/) and generate 
 ```
 allprojects {
     repositories {
-         maven {
-            url  "https://dl.bintray.com/pivopod/PivoProSDK"
-        }
+         mavenCentral()
     }
 ```
 2- In your app-level `build.gradle` file, add dependencies for PivoBasicSdk
 
 ```groovy
 dependencies {
- implementation 'app.pivo.android.prosdk:PivoProSdk:1.0.1-beta'
+ implementation 'app.pivo:prosdk:1.0.0'
  implementation 'com.polidea.rxandroidble:rxandroidble:1.5.0'
  /**
   * RxJava dependencies
