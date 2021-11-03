@@ -31,7 +31,7 @@ open class CameraBaseFragment : Fragment(), ICameraCallback {
 
     val client = Socket(ip, port)
     val output = PrintWriter(client.getOutputStream(), true)
-    val input = BufferedReader(InputStreamReader(client.inputStream))
+    //val input = BufferedReader(InputStreamReader(client.inputStream))
 
     //
 
@@ -356,12 +356,11 @@ open class CameraBaseFragment : Fragment(), ICameraCallback {
             // being tracked object
             val rect = Rect(x, y, x + width, y + height)
             //바운딩 박스 영역 출력(0,0) -> (960,720)
-            Log.d("tracking", "box: " + x + " " + y + " " + (x + width) + " " + (y + height));
+            Log.d("tracking", "box: " + x + " " + y + " " + (x + width) + " " + (y + height))
 
-            println("Client sending [Hello]")
-            output.println("Hello")
-            println("Client receiving [${input.readLine()}]")
-            client.close()
+            var data :String = (" " + x + " " + y + " " + (x + width) + " " + (y + height))
+            output.write(data) //출력 스트림에 데이터 넣기
+            output.flush(); //출력
 
 
             // create an instance of ActionGraphic and add view to parent tracking layout
