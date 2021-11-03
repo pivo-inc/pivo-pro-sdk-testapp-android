@@ -19,7 +19,21 @@ import app.pivo.android.prosdkdemo.camera.*
 import kotlinx.android.synthetic.main.fragment_camera_base.*
 import kotlin.math.min
 
+//소켓 통신 위한 것
+import java.io.*;
+import java.net.Socket
+
 open class CameraBaseFragment : Fragment(), ICameraCallback {
+
+    //소켓 통신
+    val ip = "192.168.0.93" // 192.168.0.0
+    val port = 9999 // 여기에 port를 입력해주세요
+
+    val client = Socket(ip, port)
+    val output = PrintWriter(client.getOutputStream(), true)
+    val input = BufferedReader(InputStreamReader(client.inputStream))
+
+    //
 
     var tracking: Tracking = Tracking.NONE
     var sensitivity: PivoSensitivity = PivoSensitivity.NORMAL
@@ -41,18 +55,18 @@ open class CameraBaseFragment : Fragment(), ICameraCallback {
         }
 
         toggle_btn_tracking?.addOnButtonCheckedListener { _, checkedId, isChecked ->
-            if (isChecked){
-                when(checkedId){
-                    R.id.none_tr ->{
+            if (isChecked) {
+                when (checkedId) {
+                    R.id.none_tr -> {
                         tracking = Tracking.NONE
                     }
-                    R.id.action_tr ->{
+                    R.id.action_tr -> {
                         tracking = Tracking.ACTION
                     }
-                    R.id.person_tr ->{
+                    R.id.person_tr -> {
                         tracking = Tracking.PERSON
                     }
-                    R.id.horse_tr ->{
+                    R.id.horse_tr -> {
                         tracking = Tracking.HORSE
                     }
                 }
@@ -62,18 +76,18 @@ open class CameraBaseFragment : Fragment(), ICameraCallback {
         }
 
         toggle_btn_sensitivity?.addOnButtonCheckedListener { _, checkedId, isChecked ->
-            if (isChecked){
-                when(checkedId){
-                    R.id.none_sen ->{
+            if (isChecked) {
+                when (checkedId) {
+                    R.id.none_sen -> {
                         sensitivity = PivoSensitivity.NONE
                     }
-                    R.id.slow_sen ->{
+                    R.id.slow_sen -> {
                         sensitivity = PivoSensitivity.SLOW
                     }
-                    R.id.normal_sen ->{
+                    R.id.normal_sen -> {
                         sensitivity = PivoSensitivity.NORMAL
                     }
-                    R.id.fast_sen ->{
+                    R.id.fast_sen -> {
                         sensitivity = PivoSensitivity.FAST
                     }
                 }
@@ -85,23 +99,23 @@ open class CameraBaseFragment : Fragment(), ICameraCallback {
         tracking_graphic_overlay.setListener(actionSelectListener)
     }
 
-    open fun switchCamera(){
+    open fun switchCamera() {
         trackingStarted = false
         PivoProSdk.getInstance().stop()
     }
 
-    fun restart(){
+    fun restart() {
         trackingStarted = false
 
-        if (tracking == Tracking.ACTION){
+        if (tracking == Tracking.ACTION) {
             region = null
             updateUI()
         }
     }
 
 
-    private fun updateUI(){
-        if (tracking_graphic_overlay == null)return
+    private fun updateUI() {
+        if (tracking_graphic_overlay == null) return
         tracking_graphic_overlay.setTrackingMethod(tracking)
 
         val handler = Handler()
@@ -120,20 +134,31 @@ open class CameraBaseFragment : Fragment(), ICameraCallback {
 
     private var trackingStarted = false
     private var frontCamera = false
-    override fun onProcessingFrame(image: Image, width:Int, height:Int, orientation:Int, frontCamera:Boolean) {
+    override fun onProcessingFrame(
+        image: Image,
+        width: Int,
+        height: Int,
+        orientation: Int,
+        frontCamera: Boolean
+    ) {
         this.frontCamera = frontCamera
 
-        Log.e("TTT", "orientation: $orientation locked: ${ViewManager.isOrientationLocked(requireContext())}")
+        Log.e(
+            "TTT",
+            "orientation: $orientation locked: ${ViewManager.isOrientationLocked(requireContext())}"
+        )
 
-        if(!ViewManager.isOrientationLocked(requireContext())){
+        if (!ViewManager.isOrientationLocked(requireContext())) {
             if (orientation == 1 || orientation == 3) {// portrait mode
                 tracking_graphic_overlay.setCameraInfo(height, width, frontCamera)
             } else {// landscape mode
                 tracking_graphic_overlay.setCameraInfo(width, height, frontCamera)
             }
-        }else{// orientation locked(portrait)
+        } else {// orientation locked(portrait)
             tracking_graphic_overlay.setCameraInfo(height, width, frontCamera)
         }
+        //Log.d("TTT","바운딩 박스: " + height + " " + width); //박스 그리는 ..
+
 
         //Create frame metadata
         val metadata = FrameMetadata.Builder()
@@ -146,34 +171,42 @@ open class CameraBaseFragment : Fragment(), ICameraCallback {
             .setRotation(orientation)
             .build()
 
-        when(tracking){//person
-            Tracking.PERSON->{
-                if (!trackingStarted){
-                    PivoProSdk.getInstance().starPersonTracking(metadata, image, sensitivity , aiTrackerListener)
+        when (tracking) {//person
+            Tracking.PERSON -> {
+                if (!trackingStarted) {
+                    PivoProSdk.getInstance()
+                        .starPersonTracking(metadata, image, sensitivity, aiTrackerListener)
                     trackingStarted = true
-                }else{
+                } else {
                     PivoProSdk.getInstance().updateTrackingFrame(image, metadata)
                 }
             }
-            Tracking.ACTION->{//action
-                if (region!=null && !trackingStarted){
-                    PivoProSdk.getInstance().startActionTracking(metadata, region, image, sensitivity, actionTrackerListener)
+            Tracking.ACTION -> {//action
+                if (region != null && !trackingStarted) {
+                    PivoProSdk.getInstance().startActionTracking(
+                        metadata,
+                        region,
+                        image,
+                        sensitivity,
+                        actionTrackerListener
+                    )
                     region = null
                     trackingStarted = true
-                }else{
-                    if (trackingStarted){
+                } else {
+                    if (trackingStarted) {
                         PivoProSdk.getInstance().updateTrackingFrame(image, metadata)
-                    }else{
+                    } else {
                         image.close()
                     }
                 }
             }
-            Tracking.HORSE->{
-                if (!trackingStarted){
-                    PivoProSdk.getInstance().startHorseTracking(metadata, image, sensitivity, aiTrackerListener)
+            Tracking.HORSE -> {
+                if (!trackingStarted) {
+                    PivoProSdk.getInstance()
+                        .startHorseTracking(metadata, image, sensitivity, aiTrackerListener)
                     region = null
                     trackingStarted = true
-                }else {
+                } else {
                     PivoProSdk.getInstance().updateTrackingFrame(image, metadata)
                 }
             }
@@ -185,18 +218,27 @@ open class CameraBaseFragment : Fragment(), ICameraCallback {
         }
     }
 
-    override fun onProcessingFrame(byteArray: ByteArray, width:Int, height:Int, orientation:Int, frontCamera:Boolean){
+    override fun onProcessingFrame(
+        byteArray: ByteArray,
+        width: Int,
+        height: Int,
+        orientation: Int,
+        frontCamera: Boolean
+    ) {
         this.frontCamera = frontCamera
 
-        Log.e("TTT", "orientation: $orientation locked: ${ViewManager.isOrientationLocked(requireContext())}")
+        Log.e(
+            "TTT",
+            "orientation: $orientation locked: ${ViewManager.isOrientationLocked(requireContext())}"
+        )
 
-        if(!ViewManager.isOrientationLocked(requireContext())){
+        if (!ViewManager.isOrientationLocked(requireContext())) {
             if (orientation == 1 || orientation == 3) {// portrait mode
                 tracking_graphic_overlay.setCameraInfo(height, width, frontCamera)
             } else {// landscape mode
                 tracking_graphic_overlay.setCameraInfo(width, height, frontCamera)
             }
-        }else{// orientation locked(portrait)
+        } else {// orientation locked(portrait)
             tracking_graphic_overlay.setCameraInfo(height, width, frontCamera)
         }
 
@@ -211,32 +253,40 @@ open class CameraBaseFragment : Fragment(), ICameraCallback {
             .setRotation(orientation)
             .build()
 
-        when(tracking){//person
-            Tracking.PERSON->{
-                if (!trackingStarted){
-                    PivoProSdk.getInstance().starPersonTracking(metadata, byteArray, sensitivity , aiTrackerListener)
+        when (tracking) {//person
+            Tracking.PERSON -> {
+                if (!trackingStarted) {
+                    PivoProSdk.getInstance()
+                        .starPersonTracking(metadata, byteArray, sensitivity, aiTrackerListener)
                     trackingStarted = true
-                }else{
+                } else {
                     PivoProSdk.getInstance().updateTrackingFrame(byteArray, metadata)
                 }
             }
-            Tracking.ACTION->{//action
-                if (region!=null && !trackingStarted){
-                    PivoProSdk.getInstance().startActionTracking(metadata, region, byteArray, sensitivity, actionTrackerListener)
+            Tracking.ACTION -> {//action
+                if (region != null && !trackingStarted) {
+                    PivoProSdk.getInstance().startActionTracking(
+                        metadata,
+                        region,
+                        byteArray,
+                        sensitivity,
+                        actionTrackerListener
+                    )
                     region = null
                     trackingStarted = true
-                }else{
-                    if (trackingStarted){
+                } else {
+                    if (trackingStarted) {
                         PivoProSdk.getInstance().updateTrackingFrame(byteArray, metadata)
                     }
                 }
             }
-            Tracking.HORSE->{
-                if (!trackingStarted){
-                    PivoProSdk.getInstance().startHorseTracking(metadata, byteArray, sensitivity, aiTrackerListener)
+            Tracking.HORSE -> {
+                if (!trackingStarted) {
+                    PivoProSdk.getInstance()
+                        .startHorseTracking(metadata, byteArray, sensitivity, aiTrackerListener)
                     region = null
                     trackingStarted = true
-                }else {
+                } else {
                     PivoProSdk.getInstance().updateTrackingFrame(byteArray, metadata)
                 }
             }
@@ -249,7 +299,8 @@ open class CameraBaseFragment : Fragment(), ICameraCallback {
 
 
     // action tracking drawing region
-    private var region: Rect?=null
+    private var region: Rect? = null
+
     // action drawing callback
     private val actionSelectListener: IActionSelector = object : IActionSelector {
         override fun onReset() {
@@ -265,12 +316,21 @@ open class CameraBaseFragment : Fragment(), ICameraCallback {
         }
     }
 
+    //액션, 오브젝트 트래킹
     private val actionTrackerListener: ITrackingListener = object : ITrackingListener {
-        override fun onTracking(x: Int, y: Int, width: Int, height: Int, frameWidth: Int, frameHeight: Int) {
+        override fun onTracking(
+            x: Int,
+            y: Int,
+            width: Int,
+            height: Int,
+            frameWidth: Int,
+            frameHeight: Int
+        ) {
             // clear graphic overlay
             tracking_graphic_overlay.clear()
             // being tracked object
             val rect = Rect(x, y, x + width, y + height)
+
 
             // create an instance of ActionGraphic and add view to parent tracking layout
             val graphic = ActionGraphic(tracking_graphic_overlay, rect)
@@ -281,12 +341,28 @@ open class CameraBaseFragment : Fragment(), ICameraCallback {
         override fun onClear() {}
     }
 
+    //사람, 말 트래킹
     private val aiTrackerListener: ITrackingListener = object : ITrackingListener {
-        override fun onTracking(x: Int, y: Int, width: Int, height: Int, frameWidth: Int, frameHeight: Int) {
+        override fun onTracking(
+            x: Int,
+            y: Int,
+            width: Int,
+            height: Int,
+            frameWidth: Int,
+            frameHeight: Int
+        ) {
             // clear graphic overlay
             tracking_graphic_overlay.clear()
             // being tracked object
             val rect = Rect(x, y, x + width, y + height)
+            //바운딩 박스 영역 출력(0,0) -> (960,720)
+            Log.d("tracking", "box: " + x + " " + y + " " + (x + width) + " " + (y + height));
+
+            println("Client sending [Hello]")
+            output.println("Hello")
+            println("Client receiving [${input.readLine()}]")
+            client.close()
+
 
             // create an instance of ActionGraphic and add view to parent tracking layout
             val graphic = ActionGraphic(tracking_graphic_overlay, rect)
@@ -297,28 +373,28 @@ open class CameraBaseFragment : Fragment(), ICameraCallback {
         override fun onTracking(rect: Rect?) {
             tracking_graphic_overlay.clear()
 
-            if (rect!=null)
-            {
+            if (rect != null) {
                 val graphic = ActionGraphic(tracking_graphic_overlay, rect)
                 tracking_graphic_overlay.add(graphic)
                 tracking_graphic_overlay.postInvalidate()
-            }else{
+            } else {
                 Log.e("Camera", "update onTracking")
             }
         }
 
         override fun onClear() {}
     }
+
     /**
      * This function is called to match aspect ratio
      */
-    private var layoutWidth:Int = 0
-    private var layoutHeight:Int = 0
+    private var layoutWidth: Int = 0
+    private var layoutHeight: Int = 0
     override fun onCameraOpened() {
         requireActivity().runOnUiThread {
             layoutWidth = min(texture.width, texture.height)
             layoutHeight = layoutWidth / 3 * 4
-            val previewLayout:View = tracking_graphic_overlay
+            val previewLayout: View = tracking_graphic_overlay
 
             val params = previewLayout.layoutParams
             if (resources.configuration.orientation === Configuration.ORIENTATION_PORTRAIT) {

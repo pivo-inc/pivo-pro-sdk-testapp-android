@@ -21,6 +21,7 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -308,7 +309,6 @@ public class GraphicOverlay extends View {
             canvas.drawRect(objRect, timerEnabled?prePaint:trackPaint);
             singleTap = false;
           }
-
         }
       }
 
