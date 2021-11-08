@@ -2,10 +2,12 @@ package app.pivo.android.prosdkdemo
 
 import android.content.res.Configuration
 import android.graphics.Rect
+import android.hardware.usb.UsbEndpoint
 import android.media.Image
 import android.os.Bundle
 import android.os.Handler
 import android.util.Log
+import android.util.Xml
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,28 +23,37 @@ import kotlin.math.min
 
 //소켓 통신 위한 것
 import java.io.*;
+import java.net.InetAddress
+import java.net.InetSocketAddress
 import java.net.Socket
+import java.net.SocketAddress
+import java.nio.charset.Charset
 
 open class CameraBaseFragment : Fragment(), ICameraCallback {
 
-    //소켓 통신
-    val ip = "192.168.0.93" // 192.168.0.0
-    val port = 9999 // 여기에 port를 입력해주세요
+    //소켓 통신을 위한 변수
+    val ip: String = "192.168.0.93"  //192.168.0.93(연구실 노트북 ip주소)
+    val port: Int = 3000 //port 번호(정수여야 한다)
 
-    val client = Socket(ip, port)
-    val output = PrintWriter(client.getOutputStream(), true)
-    //val input = BufferedReader(InputStreamReader(client.inputStream))
-
-    //
+    //소켓 통신에 보낼 데이터 형태
+    var client: Socket? = null //클라이언트 소켓
 
     var tracking: Tracking = Tracking.NONE
     var sensitivity: PivoSensitivity = PivoSensitivity.NORMAL
     lateinit var cameraController: CameraController
 
+    //이 스크립트 처음 시작, unity의 void Start()같은 부분
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        //클라이언트 소켓 시작, UDP 소켓 생성
+        client = Socket(InetAddress.getByName(ip), port)
+
+        //Ubuntu ros master 와 NW 통신 개시
+        val addr: SocketAddress = InetSocketAddress(ip, port) //서버에 연결 요청
+        client!!.connect(addr)
+
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_camera_base, container, false)
     }
@@ -354,14 +365,19 @@ open class CameraBaseFragment : Fragment(), ICameraCallback {
             // clear graphic overlay
             tracking_graphic_overlay.clear()
             // being tracked object
-            val rect = Rect(x, y, x + width, y + height)
+            val rect = Rect(x, y, x + width, y + height) //x: 열, y: 행
+
+            //바운딩 박스 그대로 송신 -> 백분율 계산은 ros 노드에서 하기
+            val left_x: Int = x
+            val right_x: Int = (x + width)
+            val left_y: Int = y
+            val right_y: Int = (y + height)
+
             //바운딩 박스 영역 출력(0,0) -> (960,720)
             Log.d("tracking", "box: " + x + " " + y + " " + (x + width) + " " + (y + height))
 
-            var data :String = (" " + x + " " + y + " " + (x + width) + " " + (y + height))
-            output.write(data) //출력 스트림에 데이터 넣기
-            output.flush(); //출력
-
+            //소켓 데이터 송신하기
+            //val bufSnd: ByteArray =
 
             // create an instance of ActionGraphic and add view to parent tracking layout
             val graphic = ActionGraphic(tracking_graphic_overlay, rect)
