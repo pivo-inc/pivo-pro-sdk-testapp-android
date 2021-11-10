@@ -23,6 +23,7 @@ import kotlin.math.min
 
 //소켓 통신 위한 것
 import java.io.*;
+import java.lang.Exception
 import java.net.InetAddress
 import java.net.InetSocketAddress
 import java.net.Socket
@@ -31,12 +32,15 @@ import java.nio.charset.Charset
 
 open class CameraBaseFragment : Fragment(), ICameraCallback {
 
+    //val: 상수, var: 변수
     //소켓 통신을 위한 변수
-    val ip: String = "192.168.0.93"  //192.168.0.93(연구실 노트북 ip주소)
-    val port: Int = 3000 //port 번호(정수여야 한다)
+    val ip: String = "172.30.1.42"  //192.168.0.93(연구실 노트북 ip주소)
+    val port: Int = 9999 //port 번호(정수여야 한다)
 
     //소켓 통신에 보낼 데이터 형태
     var client: Socket? = null //클라이언트 소켓
+    var inputStream: InputStream? = null
+    var outputStream: OutputStream? = null
 
     var tracking: Tracking = Tracking.NONE
     var sensitivity: PivoSensitivity = PivoSensitivity.NORMAL
@@ -47,12 +51,16 @@ open class CameraBaseFragment : Fragment(), ICameraCallback {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        //클라이언트 소켓 시작, UDP 소켓 생성
-        client = Socket(InetAddress.getByName(ip), port)
+        try {
+            //클라이언트 소켓 시작, UDP 소켓 생성
+            val socketAddress = InetAddress.getLocalHost()
+            client = Socket(socketAddress, port)
+            outputStream = client!!.getOutputStream()
+            inputStream = client!!.getInputStream()
 
-        //Ubuntu ros master 와 NW 통신 개시
-        val addr: SocketAddress = InetSocketAddress(ip, port) //서버에 연결 요청
-        client!!.connect(addr)
+        } catch (e: Exception){
+            Log.d("Exception","socket connect exception start!!!")
+        }
 
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_camera_base, container, false)
@@ -367,17 +375,39 @@ open class CameraBaseFragment : Fragment(), ICameraCallback {
             // being tracked object
             val rect = Rect(x, y, x + width, y + height) //x: 열, y: 행
 
-            //바운딩 박스 그대로 송신 -> 백분율 계산은 ros 노드에서 하기
-            val left_x: Int = x
-            val right_x: Int = (x + width)
-            val left_y: Int = y
-            val right_y: Int = (y + height)
+            //바운딩 박스 백분율 계산
+            val x1: Float = x.toFloat() / 960
+            val x2: Float = (x + width).toFloat() / 960
+            val y1: Float = y.toFloat() / 720
+            val y2: Float = (y + height).toFloat() / 720
 
             //바운딩 박스 영역 출력(0,0) -> (960,720)
-            Log.d("tracking", "box: " + x + " " + y + " " + (x + width) + " " + (y + height))
+            Log.d("tracking", "box: " + x1 + " " + y1 + " " + x2 + " " + y2)
 
             //소켓 데이터 송신하기
-            //val bufSnd: ByteArray =
+            var sendT:ByteArray = ByteArray(16) //크기 16(4바이트 * 4개)
+            var x1_int = x1.toInt()
+            var x2_int = x2.toInt()
+            var y1_int = y1.toInt()
+            var y2_int = y2.toInt()
+            sendT[0] = (x1_int shr 24).toByte() //shr: >>
+            sendT[1] = (x1_int shr 16).toByte()
+            sendT[2] = (x1_int shr 8).toByte()
+            sendT[3] = (x1_int).toByte()
+            sendT[4] = (x2_int shr 24).toByte()
+            sendT[5] = (x2_int shr 16).toByte()
+            sendT[6] = (x2_int shr 8).toByte()
+            sendT[7] = (x2_int).toByte()
+            sendT[8] = (y1_int shr 24).toByte()
+            sendT[9] = (y1_int shr 16).toByte()
+            sendT[10] = (y1_int shr 8).toByte()
+            sendT[11] = (y1_int).toByte()
+            sendT[12] = (y2_int shr 24).toByte()
+            sendT[13] = (y2_int shr 16).toByte()
+            sendT[14] = (y2_int shr 8).toByte()
+            sendT[15] = (y2_int).toByte()
+
+            outputStream?.write(sendT) //서버로 데이터 보내기
 
             // create an instance of ActionGraphic and add view to parent tracking layout
             val graphic = ActionGraphic(tracking_graphic_overlay, rect)
@@ -408,7 +438,7 @@ open class CameraBaseFragment : Fragment(), ICameraCallback {
     override fun onCameraOpened() {
         requireActivity().runOnUiThread {
             layoutWidth = min(texture.width, texture.height)
-            layoutHeight = layoutWidth / 3 * 4
+            layoutHeight = layoutWidth / 9 * 16
             val previewLayout: View = tracking_graphic_overlay
 
             val params = previewLayout.layoutParams
