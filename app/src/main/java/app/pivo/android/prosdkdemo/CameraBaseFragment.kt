@@ -6,6 +6,7 @@ import android.hardware.usb.UsbEndpoint
 import android.media.Image
 import android.os.Bundle
 import android.os.Handler
+import android.provider.ContactsContract
 import android.util.Log
 import android.util.Xml
 import android.view.LayoutInflater
@@ -29,18 +30,18 @@ import java.net.InetSocketAddress
 import java.net.Socket
 import java.net.SocketAddress
 import java.nio.charset.Charset
+//UDP 관련
+import java.net.DatagramPacket
+import java.net.DatagramSocket
 
 open class CameraBaseFragment : Fragment(), ICameraCallback {
 
     //val: 상수, var: 변수
     //소켓 통신을 위한 변수
-    val ip: String = "172.30.1.42"  //192.168.0.93(연구실 노트북 ip주소)
-    val port: Int = 9999 //port 번호(정수여야 한다)
-
-    //소켓 통신에 보낼 데이터 형태
-    var client: Socket? = null //클라이언트 소켓
-    var inputStream: InputStream? = null
-    var outputStream: OutputStream? = null
+    val ip: String = "192.168.0.93"  //192.168.0.93(연구실 노트북 ip주소) (서버 주소)
+    val port: Int = 9999 //port 번호(정수여야 한다) (사용할 통신 포트)
+    var client: DatagramSocket? = null //클라이언트 소켓
+    var serverAddr: InetAddress? = null //retrieve the servername
 
     var tracking: Tracking = Tracking.NONE
     var sensitivity: PivoSensitivity = PivoSensitivity.NORMAL
@@ -51,23 +52,26 @@ open class CameraBaseFragment : Fragment(), ICameraCallback {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        try {
-            //클라이언트 소켓 시작, UDP 소켓 생성
-            val socketAddress = InetAddress.getLocalHost()
-            client = Socket(socketAddress, port)
-            outputStream = client!!.getOutputStream()
-            inputStream = client!!.getInputStream()
-
-        } catch (e: Exception){
-            Log.d("Exception","socket connect exception start!!!")
-        }
-
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_camera_base, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        //소켓 생성
+        try {
+            //클라이언트 소켓 종료 + 시작, UDP 소켓 생성
+            client?.close()
+            serverAddr = InetAddress.getByName(ip)
+            client = DatagramSocket(port)
+            var welcome_message = "Hello! I'm android, client."
+            var packet = DatagramPacket(welcome_message.toByteArray(), welcome_message.length, serverAddr, port)
+            client?.send(packet) //서버로 데이터 보내기, ?: null일 수 있음을 의미
+
+        } catch (e: Exception){
+            Log.d("Exception","socket connect exception start!!!")
+        }
 
         switch_camera_view.setOnClickListener {
             switchCamera()
@@ -407,7 +411,8 @@ open class CameraBaseFragment : Fragment(), ICameraCallback {
             sendT[14] = (y2_int shr 8).toByte()
             sendT[15] = (y2_int).toByte()
 
-            outputStream?.write(sendT) //서버로 데이터 보내기
+            var packet = DatagramPacket(sendT, sendT.size, serverAddr, port)
+            client?.send(packet) //서버로 데이터 보내기, ?: null일 수 있음을 의미
 
             // create an instance of ActionGraphic and add view to parent tracking layout
             val graphic = ActionGraphic(tracking_graphic_overlay, rect)
@@ -430,6 +435,20 @@ open class CameraBaseFragment : Fragment(), ICameraCallback {
         override fun onClear() {}
     }
 
+    //데이터 보내는 쓰레드 클래스
+    class SendData: Thread(){
+        override fun run(){
+            try {
+                //UDP 통신용 소켓 생성
+                var socket: DatagramSocket = DatagramSocket()
+                //서버 주소 변수
+                
+            } catch (e: Exception) {
+
+            }
+        }
+    }
+
     /**
      * This function is called to match aspect ratio
      */
@@ -438,7 +457,7 @@ open class CameraBaseFragment : Fragment(), ICameraCallback {
     override fun onCameraOpened() {
         requireActivity().runOnUiThread {
             layoutWidth = min(texture.width, texture.height)
-            layoutHeight = layoutWidth / 9 * 16
+            layoutHeight = layoutWidth / 3 * 4
             val previewLayout: View = tracking_graphic_overlay
 
             val params = previewLayout.layoutParams
