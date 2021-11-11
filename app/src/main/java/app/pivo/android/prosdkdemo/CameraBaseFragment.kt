@@ -442,7 +442,7 @@ open class CameraBaseFragment : Fragment(), ICameraCallback {
                 //UDP 통신용 소켓 생성
                 var socket: DatagramSocket = DatagramSocket()
                 //서버 주소 변수
-                
+
             } catch (e: Exception) {
 
             }
