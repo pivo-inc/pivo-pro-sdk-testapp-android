@@ -2,18 +2,14 @@ package app.pivo.android.prosdkdemo
 
 import android.content.res.Configuration
 import android.graphics.Rect
-import android.hardware.usb.UsbEndpoint
 import android.media.Image
 import android.os.Bundle
 import android.os.Handler
-import android.provider.ContactsContract
 import android.util.Log
-import android.util.Xml
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import app.pivo.android.prosdk.ImageUtils
 import app.pivo.android.prosdk.PivoProSdk
 import app.pivo.android.prosdk.PivoSensitivity
 import app.pivo.android.prosdk.tracking.FrameMetadata
@@ -23,13 +19,8 @@ import kotlinx.android.synthetic.main.fragment_camera_base.*
 import kotlin.math.min
 
 //소켓 통신 위한 것
-import java.io.*;
 import java.lang.Exception
 import java.net.InetAddress
-import java.net.InetSocketAddress
-import java.net.Socket
-import java.net.SocketAddress
-import java.nio.charset.Charset
 //UDP 관련
 import java.net.DatagramPacket
 import java.net.DatagramSocket
@@ -38,8 +29,8 @@ open class CameraBaseFragment : Fragment(), ICameraCallback {
 
     //val: 상수, var: 변수
     //소켓 통신을 위한 변수
-    val ip: String = "192.168.0.93"  //192.168.0.93(연구실 노트북 ip주소) (서버 주소)
-    val port: Int = 9999 //port 번호(정수여야 한다) (사용할 통신 포트)
+    val ip: String = "192.168.0.93"  //192.168.0.2(연구실 노트북 ip주소) (서버 주소)
+    val port: Int = 9999 //port 번호(정수여야 한다) (사용할 통신 포트, 서버 포트)
     var client: DatagramSocket? = null //클라이언트 소켓
     var serverAddr: InetAddress? = null //retrieve the servername
 
@@ -62,15 +53,16 @@ open class CameraBaseFragment : Fragment(), ICameraCallback {
         //소켓 생성
         try {
             //클라이언트 소켓 종료 + 시작, UDP 소켓 생성
-            client?.close()
-            serverAddr = InetAddress.getByName(ip)
+            //client?.close()
+            serverAddr = InetAddress.getByName(ip) //서버 ip 주소 가져오기
             client = DatagramSocket(port)
-            var welcome_message = "Hello! I'm android, client."
-            var packet = DatagramPacket(welcome_message.toByteArray(), welcome_message.length, serverAddr, port)
-            client?.send(packet) //서버로 데이터 보내기, ?: null일 수 있음을 의미
+            var welcome_message:ByteArray = ("Hello! I'm android, client.").toByteArray()
+            var packet = DatagramPacket(welcome_message, welcome_message.size, serverAddr, port)
+            client!!.send(packet) //서버로 데이터 보내기, ?: null일 수 있음을 의미
+            Log.d("Socket","Client socket start!!!")
 
         } catch (e: Exception){
-            Log.d("Exception","socket connect exception start!!!")
+            Log.d("Exception",e.toString())
         }
 
         switch_camera_view.setOnClickListener {
@@ -386,7 +378,7 @@ open class CameraBaseFragment : Fragment(), ICameraCallback {
             val y2: Float = (y + height).toFloat() / 720
 
             //바운딩 박스 영역 출력(0,0) -> (960,720)
-            Log.d("tracking", "box: " + x1 + " " + y1 + " " + x2 + " " + y2)
+//            Log.d("tracking", "box: " + x1 + " " + y1 + " " + x2 + " " + y2)
 
             //소켓 데이터 송신하기
             var sendT:ByteArray = ByteArray(16) //크기 16(4바이트 * 4개)
@@ -413,6 +405,9 @@ open class CameraBaseFragment : Fragment(), ICameraCallback {
 
             var packet = DatagramPacket(sendT, sendT.size, serverAddr, port)
             client?.send(packet) //서버로 데이터 보내기, ?: null일 수 있음을 의미
+
+            //바운딩 박스 영역 출력(0,0) -> (960,720)
+            Log.d("tracking", "box: " + packet.getData().toString())
 
             // create an instance of ActionGraphic and add view to parent tracking layout
             val graphic = ActionGraphic(tracking_graphic_overlay, rect)
