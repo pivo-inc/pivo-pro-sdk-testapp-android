@@ -27,7 +27,7 @@ dependencies {
  implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
  implementation 'io.reactivex.rxjava2:rxjava:2.2.17'
  implementation 'com.trello:rxlifecycle:1.0'
- implementation 'com.trello:rxlifecycle-components:1.0
+ implementation 'com.trello:rxlifecycle-components:1.0'
 }
 ```
 
