@@ -32,4 +32,6 @@
     <string name="rright"><![CDATA[>>]]></string>
     <string name="camera1">Go camera 1</string>
     <string name="camera2">Go camera 2</string>
+    <string name="enable_bypass">Enable Bypass</string>
+    <string name="disable_bypass">Disable Bypass</string>
 </resources>

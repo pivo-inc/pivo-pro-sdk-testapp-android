@@ -65,7 +65,7 @@ dependencies {
      */
     implementation 'com.polidea.rxandroidble:rxandroidble:1.5.0'
 
-    implementation 'app.pivo:prosdk:1.0.0'
+    implementation 'app.pivo:prosdk:1.1.0'
 
 
     /**
