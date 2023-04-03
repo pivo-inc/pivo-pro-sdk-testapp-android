@@ -2,16 +2,17 @@ package app.pivo.android.prosdkdemo
 
 import  android.Manifest
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import app.pivo.android.basicsdk.events.PivoEvent
+import app.pivo.android.basicsdk.events.PivoEventBus
 import com.nabinbhandari.android.permissions.PermissionHandler
 import com.nabinbhandari.android.permissions.Permissions
 import io.reactivex.functions.Consumer
-import app.pivo.android.prosdk.events.PivoEventBus
-import app.pivo.android.prosdk.events.PivoEvent
 import app.pivo.android.prosdk.PivoProSdk
 import kotlinx.android.synthetic.main.activity_pivo_scanning.*
 
@@ -89,7 +90,7 @@ class PivoScanningActivity : AppCompatActivity() {
     //check permissions if they're granted start scanning, otherwise ask to user to grant permissions
     private fun checkPermission(){// alternative Permission library Dexter
         Permissions.check(this,
-            permissionList, null, null,
+            permissionList.toTypedArray(), null, null,
             object : PermissionHandler() {
                 override fun onGranted() {
                     scanning_bar.visibility = View.VISIBLE
@@ -98,10 +99,17 @@ class PivoScanningActivity : AppCompatActivity() {
             })
     }
     //permissions which are required for bluetooth
-    private var permissionList = arrayOf(
+    private var permissionList = mutableListOf(
+        Manifest.permission.CAMERA,
         Manifest.permission.ACCESS_FINE_LOCATION,
-        Manifest.permission.ACCESS_COARSE_LOCATION,
-        Manifest.permission.BLUETOOTH,
-        Manifest.permission.BLUETOOTH_ADMIN,
-        Manifest.permission.CAMERA)
+        Manifest.permission.ACCESS_COARSE_LOCATION
+    ).also {
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.R) {
+            it.add(Manifest.permission.BLUETOOTH_SCAN)
+            it.add(Manifest.permission.BLUETOOTH_CONNECT)
+        } else {
+            it.add(Manifest.permission.BLUETOOTH)
+            it.add(Manifest.permission.BLUETOOTH_ADMIN)
+        }
+    }
 }

@@ -21,18 +21,17 @@ class App:Application() {
         PivoProSdk.getInstance().unlockWithLicenseKey(getLicenseContent())
     }
 
-    private fun getLicenseContent():String?{
-        var inputStream = assets.open("pivoProLicense.json")
+    private fun getLicenseContent(): String {
+        val inputStream = assets.open("pivoProLicense.json")
         return readFile(inputStream)
     }
 
     @Throws(IOException::class)
-    fun readFile(inputStream: InputStream?): String? {
+    fun readFile(inputStream: InputStream?): String {
         val str = StringBuilder()
-        val br: BufferedReader
-        br = BufferedReader(InputStreamReader(inputStream))
-        var line: String?=null
-        while (br.readLine().also({ line = it }) != null) {
+        val br = BufferedReader(InputStreamReader(inputStream))
+        var line: String?
+        while (br.readLine().also { line = it } != null) {
             str.append(line)
         }
         br.close()

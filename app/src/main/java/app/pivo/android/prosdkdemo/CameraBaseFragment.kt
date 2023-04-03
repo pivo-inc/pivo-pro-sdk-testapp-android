@@ -10,7 +10,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import app.pivo.android.prosdk.ImageUtils
 import app.pivo.android.prosdk.PivoProSdk
 import app.pivo.android.prosdk.PivoSensitivity
 import app.pivo.android.prosdk.tracking.FrameMetadata
@@ -122,9 +121,6 @@ open class CameraBaseFragment : Fragment(), ICameraCallback {
     private var frontCamera = false
     override fun onProcessingFrame(image: Image, width:Int, height:Int, orientation:Int, frontCamera:Boolean) {
         this.frontCamera = frontCamera
-
-        Log.e("TTT", "orientation: $orientation locked: ${ViewManager.isOrientationLocked(requireContext())}")
-
         if(!ViewManager.isOrientationLocked(requireContext())){
             if (orientation == 1 || orientation == 3) {// portrait mode
                 tracking_graphic_overlay.setCameraInfo(height, width, frontCamera)
@@ -187,9 +183,6 @@ open class CameraBaseFragment : Fragment(), ICameraCallback {
 
     override fun onProcessingFrame(byteArray: ByteArray, width:Int, height:Int, orientation:Int, frontCamera:Boolean){
         this.frontCamera = frontCamera
-
-        Log.e("TTT", "orientation: $orientation locked: ${ViewManager.isOrientationLocked(requireContext())}")
-
         if(!ViewManager.isOrientationLocked(requireContext())){
             if (orientation == 1 || orientation == 3) {// portrait mode
                 tracking_graphic_overlay.setCameraInfo(height, width, frontCamera)
@@ -214,7 +207,11 @@ open class CameraBaseFragment : Fragment(), ICameraCallback {
         when(tracking){//person
             Tracking.PERSON->{
                 if (!trackingStarted){
-                    PivoProSdk.getInstance().starPersonTracking(metadata, byteArray, sensitivity , aiTrackerListener)
+                    try {
+                        PivoProSdk.getInstance().starPersonTracking(metadata, byteArray, sensitivity , aiTrackerListener)
+                    } catch (e: Exception) {
+                        Log.e("aa", "${e.message}")
+                    }
                     trackingStarted = true
                 }else{
                     PivoProSdk.getInstance().updateTrackingFrame(byteArray, metadata)

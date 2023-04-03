@@ -27,9 +27,22 @@ import java.lang.Long
 import java.util.*
 import java.util.concurrent.Semaphore
 import java.util.concurrent.TimeUnit
-import kotlin.collections.ArrayList
+import kotlin.Array
+import kotlin.Boolean
+import kotlin.ByteArray
+import kotlin.Comparator
+import kotlin.Double
+import kotlin.Int
+import kotlin.NullPointerException
+import kotlin.RuntimeException
+import kotlin.String
+import kotlin.Unit
+import kotlin.also
+import kotlin.apply
+import kotlin.let
 import kotlin.math.abs
 import kotlin.math.min
+import kotlin.with
 
 /**
  * Created by murodjon on 2020/04/10
@@ -105,7 +118,7 @@ class CameraController(
             cameraOpenCloseLock.release()
             cameraDevice = _cameraDevice
             createCameraPreviewSession()
-            listener?.onCameraOpened()
+            listener.onCameraOpened()
         }
 
         override fun onDisconnected(_cameraDevice: CameraDevice) {
@@ -116,7 +129,7 @@ class CameraController(
 
         override fun onError(cameraDevice: CameraDevice, error: Int) {
             onDisconnected(cameraDevice)
-            listener?.onCameraError()
+            listener.onCameraError()
         }
     }
 
@@ -169,7 +182,7 @@ class CameraController(
         //listener?.onProcessingFrame(image, frameSize!!.width, frameSize!!.height, getTrackingFrameRotation()/90, isFrontCamera())
 
         // note: Please use the below code to use byteArray api
-        listener?.onProcessingFrame(ImageUtils.convertYUV420888ToNV21(image)!!, frameSize!!.width, frameSize!!.height, getTrackingFrameRotation()/90, isFrontCamera())
+        listener.onProcessingFrame(ImageUtils.convertYUV420888ToNV21(image)!!, frameSize!!.width, frameSize!!.height, getTrackingFrameRotation()/90, isFrontCamera())
         image.close()
     }
 
@@ -475,7 +488,9 @@ class CameraController(
      */
     private fun startBackgroundThread() {
         backgroundThread = HandlerThread("CameraBackground").also { it.start() }
-        backgroundHandler = Handler(backgroundThread?.looper)
+        backgroundThread?.let {
+            backgroundHandler = Handler(it.looper)
+        }
     }
 
     /**
@@ -501,7 +516,7 @@ class CameraController(
             val texture = textureView.surfaceTexture
 
             // We configure the size of default buffer to be the size of camera preview we want.
-            texture.setDefaultBufferSize(previewSize.width, previewSize.height)
+            texture?.setDefaultBufferSize(previewSize.width, previewSize.height)
 
             // This is the output Surface we need to start preview.
             val surface = Surface(texture)

@@ -146,7 +146,7 @@ class LegacyCameraFragment : CameraBaseFragment() {
             }
             val cameraSizes: List<Camera.Size> = parameters.supportedPreviewSizes
 
-            val sizes: ArrayList<Size> = arrayListOf<Size>()
+            val sizes: ArrayList<Size> = arrayListOf()
 
             for (size in cameraSizes) {
                 sizes.add(Size(size.width, size.height))

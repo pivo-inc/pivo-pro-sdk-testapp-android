@@ -19,15 +19,47 @@ allprojects {
 
 ```groovy
 dependencies {
- implementation 'app.pivo:prosdk:1.0.0'
- implementation 'com.polidea.rxandroidble:rxandroidble:1.5.0'
- /**
-  * RxJava dependencies
-  */
- implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
- implementation 'io.reactivex.rxjava2:rxjava:2.2.17'
- implementation 'com.trello:rxlifecycle:1.0'
- implementation 'com.trello:rxlifecycle-components:1.0'
+    /**
+     * Tensorflow module
+     */
+    implementation 'org.tensorflow:tensorflow-lite:1.13.1'
+
+    /**
+     * Pivo pod controller dependencies
+     */
+    implementation 'app.pivo.android.basicsdk:basicsdk:1.3.1'
+
+    /**
+     * Pivo Pro SDK dependencies
+     */
+    implementation 'app.pivo:prosdk:1.3.1'
+
+    /**
+     * RxJava dependencies
+     */
+    implementation "io.reactivex.rxjava2:rxjava:2.2.19"
+    implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
+    implementation 'io.reactivex.rxjava2:rxkotlin:2.4.0'
+
+    /**
+     * RxLifecycle.
+     * This library allows one to automatically complete sequences based on a second lifecycle stream.
+     */
+    implementation 'com.trello:rxlifecycle:1.0'
+    implementation 'com.trello:rxlifecycle-components:1.0'
+
+    /**
+     * RxAndroidBle is a powerful painkiller for Android's Bluetooth Low Energy headaches
+     * https://github.com/Polidea/RxAndroidBle
+     */
+    implementation 'com.polidea.rxandroidble2:rxandroidble:1.17.2'
+    implementation 'com.jakewharton.rx2:replaying-share-kotlin:2.2.0'
+
+    /**
+     * Coroutine dependencies
+     */
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.2"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.2"
 }
 ```
 

@@ -7,11 +7,10 @@ import android.widget.AdapterView
 import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatActivity
-import app.pivo.android.prosdkdemo.R
+import app.pivo.android.basicsdk.events.PivoEvent
+import app.pivo.android.basicsdk.events.PivoEventBus
 import io.reactivex.functions.Consumer
 import app.pivo.android.prosdk.PivoProSdk
-import app.pivo.android.prosdk.events.PivoEvent
-import app.pivo.android.prosdk.events.PivoEventBus
 import kotlinx.android.synthetic.main.activity_pivo_controller.*
 
 
@@ -32,13 +31,13 @@ class PivoControllerActivity : AppCompatActivity() {
         setContentView(R.layout.activity_pivo_controller)
 
         //get Pivo supported speed list
-        val rotationSpeedList = PivoProSdk.getInstance().supportedSpeedsInSecondsPerRound.toMutableList()
+        val rotationSpeedList = PivoProSdk.getInstance().getSupportedSpeeds().toMutableList()
 
         //get Pivo supported rotate legecy speed list
-        val remoteSpeedList = PivoProSdk.getInstance().supportedSpeedsByRemoteInSecondsPerRound.toMutableList()
+        val remoteSpeedList = PivoProSdk.getInstance().getSupportRemoteSpeeds().toMutableList()
 
         //show pivo version
-        version_view.text = "Pivo: ${PivoProSdk.getInstance().deviceInfo}"
+        version_view.text = "Pivo: ${PivoProSdk.getInstance().getDeviceInfo()}"
 //        btnGetMacAddress.visibility = if (PivoProSdk.getInstance().version.version>=5)View.VISIBLE else View.GONE
 
         //rotate continuously to left
@@ -93,7 +92,7 @@ class PivoControllerActivity : AppCompatActivity() {
         speed_list_view.onItemSelectedListener = object : OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, itemPosition: Int, id: Long) {
                 rotationSpeedPosition = itemPosition
-                PivoProSdk.getInstance().setSpeedBySecondsPerRound(rotationSpeedList[itemPosition])
+                PivoProSdk.getInstance().setSpeed(rotationSpeedList[itemPosition])
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {}
@@ -104,7 +103,7 @@ class PivoControllerActivity : AppCompatActivity() {
         remote_speed_list_view.onItemSelectedListener = object : OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, itemPosition: Int, id: Long) {
                 remoteSpeedPosition = itemPosition
-                PivoProSdk.getInstance().setSpeedBySecondsPerRoundRemote(remoteSpeedList[itemPosition])
+                PivoProSdk.getInstance().setSpeed(remoteSpeedList[itemPosition])
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {}
@@ -167,8 +166,6 @@ class PivoControllerActivity : AppCompatActivity() {
             PivoEventBus.PIVO_NOTIFICATION, this, Consumer {
                 if (it is PivoEvent.BatteryChanged){
                     notification_view.text = "BatteryLevel: ${it.level}"
-                } else if(it is PivoEvent.Rotated) {
-                    degree_view.text = "degree: ${it.rotationDegree}, speed: ${it.speed}, direction: ${it.direction}"
                 } else{
                     notification_view.text = "Notification Received"
                 }

@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import app.pivo.android.prosdk.util.PivoDevice
+import app.pivo.android.sdk.model.PivoDevice
 import java.util.*
 
 /**
