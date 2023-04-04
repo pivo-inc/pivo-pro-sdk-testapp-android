@@ -166,6 +166,8 @@ class PivoControllerActivity : AppCompatActivity() {
             PivoEventBus.PIVO_NOTIFICATION, this, Consumer {
                 if (it is PivoEvent.BatteryChanged){
                     notification_view.text = "BatteryLevel: ${it.level}"
+                } else if(it is PivoEvent.Rotated) {
+                    degree_view.text = "degree: ${it.horizontalMovement.rotationDegree}, speed: ${it.horizontalMovement.speed}, direction: ${it.horizontalMovement.direction}"
                 } else{
                     notification_view.text = "Notification Received"
                 }
