@@ -14,32 +14,39 @@ import app.pivo.android.prosdk.PivoProSdk
 import app.pivo.android.prosdk.PivoSensitivity
 import app.pivo.android.prosdk.tracking.FrameMetadata
 import app.pivo.android.prosdk.util.ITrackingListener
-import app.pivo.android.prosdkdemo.camera.*
-import kotlinx.android.synthetic.main.fragment_camera_base.*
+import app.pivo.android.prosdkdemo.camera.ActionGraphic
+import app.pivo.android.prosdkdemo.camera.CameraController
+import app.pivo.android.prosdkdemo.camera.IActionSelector
+import app.pivo.android.prosdkdemo.camera.ICameraCallback
+import app.pivo.android.prosdkdemo.camera.Tracking
+import app.pivo.android.prosdkdemo.camera.ViewManager
+import app.pivo.android.prosdkdemo.databinding.FragmentCameraBaseBinding
 import kotlin.math.min
 
 open class CameraBaseFragment : Fragment(), ICameraCallback {
 
-    var tracking: Tracking = Tracking.NONE
-    var sensitivity: PivoSensitivity = PivoSensitivity.NORMAL
+    private var tracking: Tracking = Tracking.NONE
+    private var sensitivity: PivoSensitivity = PivoSensitivity.NORMAL
     lateinit var cameraController: CameraController
+    
+    lateinit var binding: FragmentCameraBaseBinding
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_camera_base, container, false)
+        binding = FragmentCameraBaseBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        switch_camera_view.setOnClickListener {
+        binding.switchCameraView.setOnClickListener {
             switchCamera()
         }
 
-        toggle_btn_tracking?.addOnButtonCheckedListener { _, checkedId, isChecked ->
+        binding.toggleBtnTracking.addOnButtonCheckedListener { _, checkedId, isChecked ->
             if (isChecked){
                 when(checkedId){
                     R.id.none_tr ->{
@@ -60,7 +67,7 @@ open class CameraBaseFragment : Fragment(), ICameraCallback {
             updateUI()
         }
 
-        toggle_btn_sensitivity?.addOnButtonCheckedListener { _, checkedId, isChecked ->
+        binding.toggleBtnSensitivity.addOnButtonCheckedListener { _, checkedId, isChecked ->
             if (isChecked){
                 when(checkedId){
                     R.id.none_sen ->{
@@ -81,7 +88,7 @@ open class CameraBaseFragment : Fragment(), ICameraCallback {
         }
 
         //tracking layout
-        tracking_graphic_overlay.setListener(actionSelectListener)
+        binding.trackingGraphicOverlay.setListener(actionSelectListener)
     }
 
     open fun switchCamera(){
@@ -100,12 +107,11 @@ open class CameraBaseFragment : Fragment(), ICameraCallback {
 
 
     private fun updateUI(){
-        if (tracking_graphic_overlay == null)return
-        tracking_graphic_overlay.setTrackingMethod(tracking)
+        binding.trackingGraphicOverlay.setTrackingMethod(tracking)
 
         val handler = Handler()
         handler.postDelayed({
-            if (tracking_graphic_overlay != null) tracking_graphic_overlay.clear()
+            binding.trackingGraphicOverlay.clear()
         }, 500)
     }
 
@@ -123,12 +129,12 @@ open class CameraBaseFragment : Fragment(), ICameraCallback {
         this.frontCamera = frontCamera
         if(!ViewManager.isOrientationLocked(requireContext())){
             if (orientation == 1 || orientation == 3) {// portrait mode
-                tracking_graphic_overlay.setCameraInfo(height, width, frontCamera)
+                binding.trackingGraphicOverlay.setCameraInfo(height, width, frontCamera)
             } else {// landscape mode
-                tracking_graphic_overlay.setCameraInfo(width, height, frontCamera)
+                binding.trackingGraphicOverlay.setCameraInfo(width, height, frontCamera)
             }
         }else{// orientation locked(portrait)
-            tracking_graphic_overlay.setCameraInfo(height, width, frontCamera)
+            binding.trackingGraphicOverlay.setCameraInfo(height, width, frontCamera)
         }
 
         //Create frame metadata
@@ -185,12 +191,12 @@ open class CameraBaseFragment : Fragment(), ICameraCallback {
         this.frontCamera = frontCamera
         if(!ViewManager.isOrientationLocked(requireContext())){
             if (orientation == 1 || orientation == 3) {// portrait mode
-                tracking_graphic_overlay.setCameraInfo(height, width, frontCamera)
+                binding.trackingGraphicOverlay.setCameraInfo(height, width, frontCamera)
             } else {// landscape mode
-                tracking_graphic_overlay.setCameraInfo(width, height, frontCamera)
+                binding.trackingGraphicOverlay.setCameraInfo(width, height, frontCamera)
             }
         }else{// orientation locked(portrait)
-            tracking_graphic_overlay.setCameraInfo(height, width, frontCamera)
+            binding.trackingGraphicOverlay.setCameraInfo(height, width, frontCamera)
         }
 
         //Create frame metadata
@@ -255,7 +261,7 @@ open class CameraBaseFragment : Fragment(), ICameraCallback {
 
         override fun onSelect(objRegion: Rect?) {
             // reset tracking area selector variable
-            tracking_graphic_overlay.reset()
+            binding.trackingGraphicOverlay.reset()
             // set tracking region
             trackingStarted = false
             region = objRegion
@@ -265,14 +271,14 @@ open class CameraBaseFragment : Fragment(), ICameraCallback {
     private val actionTrackerListener: ITrackingListener = object : ITrackingListener {
         override fun onTracking(x: Int, y: Int, width: Int, height: Int, frameWidth: Int, frameHeight: Int) {
             // clear graphic overlay
-            tracking_graphic_overlay.clear()
+            binding.trackingGraphicOverlay.clear()
             // being tracked object
             val rect = Rect(x, y, x + width, y + height)
 
             // create an instance of ActionGraphic and add view to parent tracking layout
-            val graphic = ActionGraphic(tracking_graphic_overlay, rect)
-            tracking_graphic_overlay.add(graphic)
-            tracking_graphic_overlay.postInvalidate()
+            val graphic = ActionGraphic(binding.trackingGraphicOverlay, rect)
+            binding.trackingGraphicOverlay.add(graphic)
+            binding.trackingGraphicOverlay.postInvalidate()
         }
 
         override fun onClear() {}
@@ -281,24 +287,24 @@ open class CameraBaseFragment : Fragment(), ICameraCallback {
     private val aiTrackerListener: ITrackingListener = object : ITrackingListener {
         override fun onTracking(x: Int, y: Int, width: Int, height: Int, frameWidth: Int, frameHeight: Int) {
             // clear graphic overlay
-            tracking_graphic_overlay.clear()
+            binding.trackingGraphicOverlay.clear()
             // being tracked object
             val rect = Rect(x, y, x + width, y + height)
 
             // create an instance of ActionGraphic and add view to parent tracking layout
-            val graphic = ActionGraphic(tracking_graphic_overlay, rect)
-            tracking_graphic_overlay.add(graphic)
-            tracking_graphic_overlay.postInvalidate()
+            val graphic = ActionGraphic(binding.trackingGraphicOverlay, rect)
+            binding.trackingGraphicOverlay.add(graphic)
+            binding.trackingGraphicOverlay.postInvalidate()
         }
 
         override fun onTracking(rect: Rect?) {
-            tracking_graphic_overlay.clear()
+            binding.trackingGraphicOverlay.clear()
 
             if (rect!=null)
             {
-                val graphic = ActionGraphic(tracking_graphic_overlay, rect)
-                tracking_graphic_overlay.add(graphic)
-                tracking_graphic_overlay.postInvalidate()
+                val graphic = ActionGraphic(binding.trackingGraphicOverlay, rect)
+                binding.trackingGraphicOverlay.add(graphic)
+                binding.trackingGraphicOverlay.postInvalidate()
             }else{
                 Log.e("Camera", "update onTracking")
             }
@@ -313,9 +319,9 @@ open class CameraBaseFragment : Fragment(), ICameraCallback {
     private var layoutHeight:Int = 0
     override fun onCameraOpened() {
         requireActivity().runOnUiThread {
-            layoutWidth = min(texture.width, texture.height)
+            layoutWidth = min(binding.texture.width, binding.texture.height)
             layoutHeight = layoutWidth / 3 * 4
-            val previewLayout:View = tracking_graphic_overlay
+            val previewLayout:View = binding.trackingGraphicOverlay
 
             val params = previewLayout.layoutParams
             if (resources.configuration.orientation === Configuration.ORIENTATION_PORTRAIT) {

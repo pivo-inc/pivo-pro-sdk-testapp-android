@@ -1,4 +1,4 @@
-package app.pivo.android.sdkdemo.pro
+package app.pivo.android.prosdkdemo
 
 import android.content.Context
 import android.graphics.SurfaceTexture
@@ -10,12 +10,9 @@ import android.util.Size
 import android.util.SparseIntArray
 import android.view.*
 import android.view.TextureView.SurfaceTextureListener
-import app.pivo.android.prosdkdemo.CameraBaseFragment
 import app.pivo.android.prosdkdemo.util.ImageUtils
-import kotlinx.android.synthetic.main.fragment_camera_base.*
 import java.io.IOException
 import java.util.*
-import kotlin.collections.ArrayList
 
 
 class LegacyCameraFragment : CameraBaseFragment() {
@@ -91,10 +88,10 @@ class LegacyCameraFragment : CameraBaseFragment() {
         // available, and "onSurfaceTextureAvailable" will not be called. In that case, we can open
         // a camera and start preview from here (otherwise, we wait until the surface is ready in
         // the SurfaceTextureListener).
-        if (texture.isAvailable) {
+        if (binding.texture.isAvailable) {
             startCamera()
         } else {
-            texture.surfaceTextureListener = surfaceTextureListener
+            binding.texture.surfaceTextureListener = surfaceTextureListener
         }
     }
 
@@ -169,7 +166,7 @@ class LegacyCameraFragment : CameraBaseFragment() {
 
         val s: Camera.Size = camera.parameters.previewSize
         camera.addCallbackBuffer(ByteArray(ImageUtils.getYUVByteSize(s.height, s.width)))
-        texture.setAspectRatio(s.height, s.width)
+        binding.texture.setAspectRatio(s.height, s.width)
         camera.startPreview()
     }
 
@@ -270,7 +267,7 @@ class LegacyCameraFragment : CameraBaseFragment() {
 
     private fun getRotation(): Int {
         val windowManager =
-            context!!.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+            requireContext().getSystemService(Context.WINDOW_SERVICE) as WindowManager
         var degrees = 0
         when (val rotation = windowManager.defaultDisplay.rotation) {
             Surface.ROTATION_0 -> degrees = 0

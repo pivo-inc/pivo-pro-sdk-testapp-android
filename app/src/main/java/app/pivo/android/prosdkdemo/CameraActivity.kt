@@ -3,7 +3,6 @@ package app.pivo.android.prosdkdemo
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import app.pivo.android.sdkdemo.pro.LegacyCameraFragment
 
 class CameraActivity : AppCompatActivity() {
 

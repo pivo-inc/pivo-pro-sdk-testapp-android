@@ -6,31 +6,35 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import app.pivo.android.basicsdk.events.PivoEvent
 import app.pivo.android.basicsdk.events.PivoEventBus
-import com.nabinbhandari.android.permissions.PermissionHandler
-import com.nabinbhandari.android.permissions.Permissions
-import io.reactivex.functions.Consumer
 import app.pivo.android.prosdk.PivoProSdk
-import kotlinx.android.synthetic.main.activity_pivo_scanning.*
+import app.pivo.android.prosdkdemo.databinding.ActivityPivoScanningBinding
 
 class PivoScanningActivity : AppCompatActivity() {
 
+    private lateinit var binding: ActivityPivoScanningBinding
+    private lateinit var requestPermissionLauncher: ActivityResultLauncher<Array<String>>
+    
     private val TAG = "MainActivity"
     private lateinit var resultAdapter: ScanResultsAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_pivo_scanning)
+
+        binding = ActivityPivoScanningBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         //initialize device scan adapter
         resultAdapter = ScanResultsAdapter()
         resultAdapter.setOnAdapterItemClickListener(object :
             ScanResultsAdapter.OnAdapterItemClickListener {
             override fun onAdapterViewClick(view: View?) {
-                val scanResult = resultAdapter.getItemAtPosition(scan_results.getChildAdapterPosition(view!!))
+                val scanResult = resultAdapter.getItemAtPosition(binding.scanResults.getChildAdapterPosition(view!!))
                 if (scanResult!=null){
                     PivoProSdk.getInstance().connectTo(scanResult)
                 }
@@ -38,20 +42,33 @@ class PivoScanningActivity : AppCompatActivity() {
         })
 
         //prepare scan result listview
-        scan_results.apply {
+        binding.scanResults.apply {
             setHasFixedSize(true)
             layoutManager = LinearLayoutManager(this@PivoScanningActivity)
             adapter = resultAdapter
         }
         //start scanning button
-        scan_button.setOnClickListener {
+        binding.scanButton.setOnClickListener {
             checkPermission()
         }
         //cancel scanning button
-        cancel_button.setOnClickListener {
-            scanning_bar.visibility = View.INVISIBLE
+        binding.cancelButton.setOnClickListener {
+            binding.scanningBar.visibility = View.INVISIBLE
             PivoProSdk.getInstance().stopScan()
             resultAdapter.clearScanResults()
+        }
+
+        requestPermissionLauncher = registerForActivityResult(
+            ActivityResultContracts.RequestMultiplePermissions()
+        ) { permissions ->
+            if (permissions.all { it.value }) {
+                // When all permissions are granted
+                binding.scanningBar.visibility = View.VISIBLE
+                PivoProSdk.getInstance().scan()
+            } else {
+                // Handling when permission is denied
+                // You can explain to the user why the permission is needed and request it again, or take action such as restricting the feature.
+            }
         }
     }
 
@@ -59,21 +76,19 @@ class PivoScanningActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         //subscibe pivo connection events
-        PivoEventBus.subscribe(
-            PivoEventBus.CONNECTION_COMPLETED, this, Consumer {
-            scanning_bar.visibility = View.INVISIBLE
-            if (it is PivoEvent.ConnectionComplete){
+        PivoEventBus.subscribe(PivoEventBus.CONNECTION_COMPLETED, this) {
+            binding.scanningBar.visibility = View.INVISIBLE
+            if (it is PivoEvent.ConnectionComplete) {
                 Log.e(TAG, "CONNECTION_COMPLETED")
                 openController()
             }
-        })
+        }
         //subscribe to get scan device
-        PivoEventBus.subscribe(
-            PivoEventBus.SCAN_DEVICE, this, Consumer {
-            if (it is PivoEvent.Scanning){
+        PivoEventBus.subscribe(PivoEventBus.SCAN_DEVICE, this) {
+            if (it is PivoEvent.Scanning) {
                 resultAdapter.addScanResult(it.device)
             }
-        })
+        }
     }
 
     override fun onPause() {
@@ -89,14 +104,7 @@ class PivoScanningActivity : AppCompatActivity() {
 
     //check permissions if they're granted start scanning, otherwise ask to user to grant permissions
     private fun checkPermission(){// alternative Permission library Dexter
-        Permissions.check(this,
-            permissionList.toTypedArray(), null, null,
-            object : PermissionHandler() {
-                override fun onGranted() {
-                    scanning_bar.visibility = View.VISIBLE
-                    PivoProSdk.getInstance().scan()
-                }
-            })
+        requestPermissionLauncher.launch(permissionList.toTypedArray())
     }
     //permissions which are required for bluetooth
     private var permissionList = mutableListOf(

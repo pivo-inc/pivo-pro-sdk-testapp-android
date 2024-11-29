@@ -1,14 +1,12 @@
-apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
+apply plugin: "com.android.application"
+apply plugin: "kotlin-android"
 
 android {
-    compileSdkVersion 31
-    buildToolsVersion "29.0.3"
+    compileSdk 35
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_21
+        targetCompatibility JavaVersion.VERSION_21
     }
 
     aaptOptions {
@@ -16,80 +14,79 @@ android {
     }
 
     defaultConfig {
-        applicationId "app.pivo.android.prosdkdemo"
-        minSdkVersion 21
-        targetSdkVersion 31
+        namespace "app.pivo.android.prosdkdemo"
+        minSdk 21
+        targetSdk 35
         versionCode 1
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    buildFeatures {
+        viewBinding = true
+        buildConfig = true
+    }
+
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
         }
     }
 }
 
 dependencies {
-    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation fileTree(include: ["*.jar"], dir: "libs")
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation 'androidx.appcompat:appcompat:1.1.0'
-    implementation 'androidx.core:core-ktx:1.3.0'
-    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
-    implementation 'androidx.core:core-ktx:1.3.0'
-    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
-    implementation 'androidx.recyclerview:recyclerview:1.2.1'
-    testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
-    implementation 'com.google.android.material:material:1.4.0-rc01'
-    /**
-     * Android runtime permission handler
-     */
-    implementation 'com.nabinbhandari.android:permissions:3.8'
+    implementation "androidx.appcompat:appcompat:1.7.0"
+    implementation "androidx.core:core-ktx:1.15.0"
+    implementation "androidx.constraintlayout:constraintlayout:2.2.0"
+    implementation "androidx.core:core-ktx:1.15.0"
+    implementation "androidx.constraintlayout:constraintlayout:2.2.0"
+    implementation "androidx.recyclerview:recyclerview:1.3.2"
+    
+    implementation "com.google.android.material:material:1.12.0"
 
     /**
      * Tensorflow module
      */
-    implementation 'org.tensorflow:tensorflow-lite:1.13.1'
+    implementation "org.tensorflow:tensorflow-lite:1.13.1"
 
     /**
      * Pivo pod controller dependencies
      */
-    implementation 'app.pivo.android.basicsdk:basicsdk:1.3.6'
+    implementation "app.pivo.android.basicsdk:basicsdk:1.3.6"
 
     /**
      * Pivo Pro SDK dependencies
      */
-    implementation 'app.pivo:prosdk:1.3.2'
+    implementation "app.pivo:prosdk:1.3.2"
 
     /**
      * RxJava dependencies
      */
-    implementation "io.reactivex.rxjava2:rxjava:2.2.19"
-    implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
-    implementation 'io.reactivex.rxjava2:rxkotlin:2.4.0'
+    implementation "io.reactivex.rxjava2:rxjava:2.2.21"
+    implementation "io.reactivex.rxjava2:rxandroid:2.1.1"
+    implementation "io.reactivex.rxjava2:rxkotlin:2.4.0"
 
     /**
      * RxLifecycle.
      * This library allows one to automatically complete sequences based on a second lifecycle stream.
      */
-    implementation 'com.trello:rxlifecycle:1.0'
-    implementation 'com.trello:rxlifecycle-components:1.0'
+    implementation "com.trello:rxlifecycle:1.0"
+    implementation "com.trello:rxlifecycle-components:1.0"
 
     /**
-     * RxAndroidBle is a powerful painkiller for Android's Bluetooth Low Energy headaches
+     * RxAndroidBle is a powerful painkiller for Android"s Bluetooth Low Energy headaches
      * https://github.com/Polidea/RxAndroidBle
      */
-    implementation 'com.polidea.rxandroidble2:rxandroidble:1.17.2'
-    implementation 'com.jakewharton.rx2:replaying-share-kotlin:2.2.0'
+    implementation "com.polidea.rxandroidble2:rxandroidble:1.18.1"
+    implementation "com.jakewharton.rx2:replaying-share-kotlin:2.2.0"
 
     /**
      * Coroutine dependencies
      */
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.2"
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.2"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0"
 }

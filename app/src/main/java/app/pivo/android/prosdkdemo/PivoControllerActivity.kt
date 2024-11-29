@@ -9,14 +9,16 @@ import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatActivity
 import app.pivo.android.basicsdk.events.PivoEvent
 import app.pivo.android.basicsdk.events.PivoEventBus
-import io.reactivex.functions.Consumer
 import app.pivo.android.prosdk.PivoProSdk
-import kotlinx.android.synthetic.main.activity_pivo_controller.*
+import app.pivo.android.prosdkdemo.databinding.ActivityPivoControllerBinding
+import io.reactivex.functions.Consumer
 
 
 class PivoControllerActivity : AppCompatActivity() {
 
     private val TAG = "PivoControllerActivity"
+
+    private lateinit var binding: ActivityPivoControllerBinding
 
     companion object{
         val CAMERA_TYPE_MSG_CODE = "CAMERA_TYPE_MSG_CODE"
@@ -28,7 +30,9 @@ class PivoControllerActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_pivo_controller)
+
+        binding = ActivityPivoControllerBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         //get Pivo supported speed list
         val rotationSpeedList = PivoProSdk.getInstance().getSupportedSpeeds().toMutableList()
@@ -37,50 +41,50 @@ class PivoControllerActivity : AppCompatActivity() {
         val remoteSpeedList = PivoProSdk.getInstance().getSupportRemoteSpeeds().toMutableList()
 
         //show pivo version
-        version_view.text = "Pivo: ${PivoProSdk.getInstance().getDeviceInfo()}"
+        binding.versionView.text = "Pivo: ${PivoProSdk.getInstance().getDeviceInfo()}"
 //        btnGetMacAddress.visibility = if (PivoProSdk.getInstance().version.version>=5)View.VISIBLE else View.GONE
 
         //rotate continuously to left
-        btn_left_con_turn.setOnClickListener { PivoProSdk.getInstance().turnLeftContinuously(rotationSpeedList[rotationSpeedPosition]) }
+        binding.btnLeftConTurn.setOnClickListener { PivoProSdk.getInstance().turnLeftContinuously(rotationSpeedList[rotationSpeedPosition]) }
 
         //rotate to left
-        btn_left_turn.setOnClickListener { PivoProSdk.getInstance().turnLeft(getAngle(), rotationSpeedList[rotationSpeedPosition]) }
+        binding.btnLeftTurn.setOnClickListener { PivoProSdk.getInstance().turnLeft(getAngle(), rotationSpeedList[rotationSpeedPosition]) }
 
         //rotate continuously to right
-        btn_right_con_turn.setOnClickListener { PivoProSdk.getInstance().turnRightContinuously(rotationSpeedList[rotationSpeedPosition]) }
+        binding.btnRightConTurn.setOnClickListener { PivoProSdk.getInstance().turnRightContinuously(rotationSpeedList[rotationSpeedPosition]) }
 
 
         //rotate to right
-        btn_right_turn.setOnClickListener { PivoProSdk.getInstance().turnRight(getAngle(), rotationSpeedList[rotationSpeedPosition]) }
+        binding.btnRightTurn.setOnClickListener { PivoProSdk.getInstance().turnRight(getAngle(), rotationSpeedList[rotationSpeedPosition]) }
 
         //stop rotating the device
-        btn_stop.setOnClickListener { PivoProSdk.getInstance().stop() }
+        binding.btnStop.setOnClickListener { PivoProSdk.getInstance().stop() }
 
-        btn_remote_left_turn.setOnClickListener { PivoProSdk.getInstance().turnLeftRemote(getRemoteAngle(), remoteSpeedList[remoteSpeedPosition]) }
+        binding.btnRemoteLeftTurn.setOnClickListener { PivoProSdk.getInstance().turnLeftRemote(getRemoteAngle(), remoteSpeedList[remoteSpeedPosition]) }
 
-        btn_remote_right_turn.setOnClickListener { PivoProSdk.getInstance().turnRightRemote(getRemoteAngle(), remoteSpeedList[remoteSpeedPosition]) }
+        binding.btnRemoteRightTurn.setOnClickListener { PivoProSdk.getInstance().turnRightRemote(getRemoteAngle(), remoteSpeedList[remoteSpeedPosition]) }
 
         //change Pivo name
-        btn_change_name.setOnClickListener {
-            if (input_pivo_name.text.isNotEmpty()){
-                PivoProSdk.getInstance().changeName(input_pivo_name.text.toString())
+        binding.btnChangeName.setOnClickListener {
+            if (binding.inputPivoName.text.isNotEmpty()){
+                PivoProSdk.getInstance().changeName(binding.inputPivoName.text.toString())
             }
         }
 
         //go camera to check tracking
-        btn_camera1.setOnClickListener {
+        binding.btnCamera1.setOnClickListener {
             val intent = Intent(this, CameraActivity::class.java)
             intent.putExtra(CAMERA_TYPE_MSG_CODE, 1)
             startActivity(intent)
         }
 
-        btn_camera2.setOnClickListener {
+        binding.btnCamera2.setOnClickListener {
             val intent = Intent(this, CameraActivity::class.java)
             intent.putExtra(CAMERA_TYPE_MSG_CODE, 2)
             startActivity(intent)
         }
 
-        btn_enbale_bypass.setOnClickListener {
+        binding.btnEnbaleBypass.setOnClickListener {
             PivoProSdk.getInstance().enableBypass(!enableBypass)
         }
 
@@ -88,8 +92,8 @@ class PivoControllerActivity : AppCompatActivity() {
 //        btnGetMacAddress.setOnClickListener { PivoProSdk.getInstance().getMacAddress() }
 
         //speed list view
-        speed_list_view.adapter= ArrayAdapter<Int>(this, android.R.layout.simple_spinner_item, rotationSpeedList)
-        speed_list_view.onItemSelectedListener = object : OnItemSelectedListener {
+        binding.speedListView.adapter= ArrayAdapter<Int>(this, android.R.layout.simple_spinner_item, rotationSpeedList)
+        binding.speedListView.onItemSelectedListener = object : OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, itemPosition: Int, id: Long) {
                 rotationSpeedPosition = itemPosition
                 PivoProSdk.getInstance().setSpeed(rotationSpeedList[itemPosition])
@@ -99,8 +103,8 @@ class PivoControllerActivity : AppCompatActivity() {
         }
 
         //remote speed list view
-        remote_speed_list_view.adapter= ArrayAdapter<Int>(this, android.R.layout.simple_spinner_item, remoteSpeedList)
-        remote_speed_list_view.onItemSelectedListener = object : OnItemSelectedListener {
+        binding.remoteSpeedListView.adapter= ArrayAdapter<Int>(this, android.R.layout.simple_spinner_item, remoteSpeedList)
+        binding.remoteSpeedListView.onItemSelectedListener = object : OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, itemPosition: Int, id: Long) {
                 remoteSpeedPosition = itemPosition
                 PivoProSdk.getInstance().setSpeed(remoteSpeedList[itemPosition])
@@ -123,53 +127,53 @@ class PivoControllerActivity : AppCompatActivity() {
         PivoEventBus.subscribe(
             PivoEventBus.REMOTE_CONTROLLER, this, Consumer {
                 when(it){
-                    is PivoEvent.RCCamera->notification_view.text = "CAMERA state: ${if(it.state==0)"Press" else "Release"}"
-                    is PivoEvent.RCMode->notification_view.text = "MODE: ${if(it.state==0)"Press" else "Release"}"
-                    is PivoEvent.RCStop->notification_view.text = "STOP: ${if(it.state==0)"Press" else "Release"}"
-                    is PivoEvent.RCRightContinuous->notification_view.text = "RIGHT_CONTINUOUS: ${if(it.state==0)"Press" else "Release"}"
-                    is PivoEvent.RCLeftContinuous->notification_view.text = "LEFT_CONTINUOUS: ${if(it.state==0)"Press" else "Release"}"
-                    is PivoEvent.RCLeft->notification_view.text = "LEFT: ${if(it.state==0)"Press" else "Release"}"
-                    is PivoEvent.RCRight->notification_view.text = "RIGHT: ${if(it.state==0)"Press" else "Release"}"
+                    is PivoEvent.RCCamera->binding.notificationView.text = "CAMERA state: ${if(it.state==0)"Press" else "Release"}"
+                    is PivoEvent.RCMode->binding.notificationView.text = "MODE: ${if(it.state==0)"Press" else "Release"}"
+                    is PivoEvent.RCStop->binding.notificationView.text = "STOP: ${if(it.state==0)"Press" else "Release"}"
+                    is PivoEvent.RCRightContinuous->binding.notificationView.text = "RIGHT_CONTINUOUS: ${if(it.state==0)"Press" else "Release"}"
+                    is PivoEvent.RCLeftContinuous->binding.notificationView.text = "LEFT_CONTINUOUS: ${if(it.state==0)"Press" else "Release"}"
+                    is PivoEvent.RCLeft->binding.notificationView.text = "LEFT: ${if(it.state==0)"Press" else "Release"}"
+                    is PivoEvent.RCRight->binding.notificationView.text = "RIGHT: ${if(it.state==0)"Press" else "Release"}"
 
                     /**
                      * This below events're deprecated
                      *
-                    is PivoEvent.RCLeftPressed->notification_view.text = "LEFT_PRESSED"
-                    is PivoEvent.RCLeftRelease->notification_view.text = "LEFT_RELEASE"
-                    is PivoEvent.RCRightPressed->notification_view.text = "RIGHT_PRESSED"
-                    is PivoEvent.RCRightRelease->notification_view.text = "RIGHT_RELEASE"
-                    is PivoEvent.RCSpeedUpPressed->notification_view.text = "SPEED_UP_PRESSED: ${it.level}"
-                    is PivoEvent.RCSpeedDownPressed->notification_view.text = "SPEED_DOWN_PRESSED: ${it.level}"
-                    is PivoEvent.RCSpeedUpRelease->notification_view.text = "SPEED_UP_RELEASE: ${it.level}"
-                    is PivoEvent.RCSpeedDownRelease->notification_view.text = "SPEED_DOWN_RELEASE: ${it.level}"
+                    is PivoEvent.RCLeftPressed->binding.notificationView.text = "LEFT_PRESSED"
+                    is PivoEvent.RCLeftRelease->binding.notificationView.text = "LEFT_RELEASE"
+                    is PivoEvent.RCRightPressed->binding.notificationView.text = "RIGHT_PRESSED"
+                    is PivoEvent.RCRightRelease->binding.notificationView.text = "RIGHT_RELEASE"
+                    is PivoEvent.RCSpeedUpPressed->binding.notificationView.text = "SPEED_UP_PRESSED: ${it.level}"
+                    is PivoEvent.RCSpeedDownPressed->binding.notificationView.text = "SPEED_DOWN_PRESSED: ${it.level}"
+                    is PivoEvent.RCSpeedUpRelease->binding.notificationView.text = "SPEED_UP_RELEASE: ${it.level}"
+                    is PivoEvent.RCSpeedDownRelease->binding.notificationView.text = "SPEED_DOWN_RELEASE: ${it.level}"
                      */
 
-                    is PivoEvent.RCSpeed->notification_view.text = "SPEED: : ${if(it.state==0)"Press" else "Release"} speed: ${it.level}"
+                    is PivoEvent.RCSpeed->binding.notificationView.text = "SPEED: : ${if(it.state==0)"Press" else "Release"} speed: ${it.level}"
                 }
             })
         //subscribe to name change event
         PivoEventBus.subscribe(
             PivoEventBus.NAME_CHANGED, this, Consumer {
                 if (it is PivoEvent.NameChanged){
-                    notification_view.text = "Name: ${it.name}"
+                    binding.notificationView.text = "Name: ${it.name}"
                 }
             })
         //subscribe to mac address event
         PivoEventBus.subscribe(
             PivoEventBus.MAC_ADDRESS, this, Consumer {
                 if (it is PivoEvent.MacAddress){
-                    notification_view.text = "Mac address: ${it.macAddress}"
+                    binding.notificationView.text = "Mac address: ${it.macAddress}"
                 }
             })
         //subscribe to get pivo notifications
         PivoEventBus.subscribe(
             PivoEventBus.PIVO_NOTIFICATION, this, Consumer {
                 if (it is PivoEvent.BatteryChanged){
-                    notification_view.text = "BatteryLevel: ${it.level}"
+                    binding.notificationView.text = "BatteryLevel: ${it.level}"
                 } else if(it is PivoEvent.Rotated) {
-                    degree_view.text = "degree: ${it.horizontalMovement.rotationDegree}, speed: ${it.horizontalMovement.speed}, direction: ${it.horizontalMovement.direction}"
+                    binding.degreeView.text = "degree: ${it.horizontalMovement.rotationDegree}, speed: ${it.horizontalMovement.speed}, direction: ${it.horizontalMovement.direction}"
                 } else{
-                    notification_view.text = "Notification Received"
+                    binding.notificationView.text = "Notification Received"
                 }
             })
 
@@ -177,14 +181,14 @@ class PivoControllerActivity : AppCompatActivity() {
             PivoEventBus.BYPASS, this, Consumer {
                 if(it is PivoEvent.BypassEvent) {
                     enableBypass = it.isEnabled
-                    btn_enbale_bypass.text = if(it.isEnabled) getString(R.string.disable_bypass) else getString(R.string.enable_bypass)
+                    binding.btnEnbaleBypass.text = if(it.isEnabled) getString(R.string.disable_bypass) else getString(R.string.enable_bypass)
                 }
             })
     }
 
     private fun getAngle():Int{
         return try {
-            val num = rotation_angle_view.text.toString()
+            val num = binding.rotationAngleView.text.toString()
             num.toInt()
         }catch (e:NumberFormatException){
             90
@@ -193,7 +197,7 @@ class PivoControllerActivity : AppCompatActivity() {
 
     private fun getRemoteAngle():Int{
         return try {
-            val num = remote_angle_view.text.toString()
+            val num = binding.remoteAngleView.text.toString()
             num.toInt()
         }catch (e:NumberFormatException){
             90

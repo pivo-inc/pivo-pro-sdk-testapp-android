@@ -3,7 +3,6 @@ package app.pivo.android.prosdkdemo
 import android.os.Bundle
 import android.view.View
 import app.pivo.android.prosdkdemo.camera.CameraController
-import kotlinx.android.synthetic.main.fragment_camera_base.*
 
 class Camera2Fragment : CameraBaseFragment() {
 
@@ -11,7 +10,7 @@ class Camera2Fragment : CameraBaseFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         //create [CameraController] object
-        cameraController = CameraController(requireActivity(), this, texture)
+        cameraController = CameraController(requireActivity(), this, binding.texture)
     }
 
     override fun onResume() {
