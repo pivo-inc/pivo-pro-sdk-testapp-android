@@ -4,18 +4,9 @@ apply plugin: "kotlin-android"
 android {
     compileSdk 35
 
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_21
-        targetCompatibility JavaVersion.VERSION_21
-    }
-
-    aaptOptions {
-        noCompress "tflite"
-    }
-
     defaultConfig {
         namespace "app.pivo.android.prosdkdemo"
-        minSdk 21
+        minSdk 28
         targetSdk 35
         versionCode 1
         versionName "1.0"
@@ -23,9 +14,13 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    aaptOptions {
+        noCompress "tflite"
+    }
+
     buildFeatures {
-        viewBinding = true
-        buildConfig = true
+        viewBinding true
+        buildConfig true
     }
 
     buildTypes {
@@ -34,24 +29,25 @@ android {
             proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
         }
     }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_21
+        targetCompatibility JavaVersion.VERSION_21
+    }
+
+    kotlinOptions {
+        jvmTarget = '21'
+    }
 }
 
 dependencies {
-    implementation fileTree(include: ["*.jar"], dir: "libs")
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation "androidx.appcompat:appcompat:1.7.0"
-    implementation "androidx.core:core-ktx:1.15.0"
-    implementation "androidx.constraintlayout:constraintlayout:2.2.0"
-    implementation "androidx.core:core-ktx:1.15.0"
-    implementation "androidx.constraintlayout:constraintlayout:2.2.0"
-    implementation "androidx.recyclerview:recyclerview:1.3.2"
-    
-    implementation "com.google.android.material:material:1.12.0"
+    implementation files( fileTree("libs") { include("*.jar", "*.aar") } )
 
-    /**
-     * Tensorflow module
-     */
-    implementation "org.tensorflow:tensorflow-lite:1.13.1"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation "androidx.core:core-ktx:1.15.0"
+    implementation "androidx.appcompat:appcompat:1.7.0"
+    implementation "com.google.android.material:material:1.12.0"
+    implementation "androidx.constraintlayout:constraintlayout:2.2.0"
 
     /**
      * Pivo pod controller dependencies
@@ -59,9 +55,19 @@ dependencies {
     implementation "app.pivo.android.basicsdk:basicsdk:1.3.6"
 
     /**
-     * Pivo Pro SDK dependencies
+     * Pivo Pro SDK dependencie
      */
-    implementation "app.pivo:prosdk:1.3.2"
+    implementation "app.pivo.android.basicsdk:prosdk:1.3.3"
+
+    /**
+     * Tensorflow module
+     */
+    implementation "org.tensorflow:tensorflow-lite:2.7.0"
+
+    /**
+     * Face tracking dependencies
+     */
+    implementation 'com.google.mlkit:face-detection:16.1.7'
 
     /**
      * RxJava dependencies
@@ -69,24 +75,4 @@ dependencies {
     implementation "io.reactivex.rxjava2:rxjava:2.2.21"
     implementation "io.reactivex.rxjava2:rxandroid:2.1.1"
     implementation "io.reactivex.rxjava2:rxkotlin:2.4.0"
-
-    /**
-     * RxLifecycle.
-     * This library allows one to automatically complete sequences based on a second lifecycle stream.
-     */
-    implementation "com.trello:rxlifecycle:1.0"
-    implementation "com.trello:rxlifecycle-components:1.0"
-
-    /**
-     * RxAndroidBle is a powerful painkiller for Android"s Bluetooth Low Energy headaches
-     * https://github.com/Polidea/RxAndroidBle
-     */
-    implementation "com.polidea.rxandroidble2:rxandroidble:1.18.1"
-    implementation "com.jakewharton.rx2:replaying-share-kotlin:2.2.0"
-
-    /**
-     * Coroutine dependencies
-     */
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0"
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0"
 }

@@ -52,6 +52,9 @@ open class CameraBaseFragment : Fragment(), ICameraCallback {
                     R.id.none_tr ->{
                         tracking = Tracking.NONE
                     }
+                    R.id.face_tr ->{
+                        tracking = Tracking.FACE
+                    }
                     R.id.action_tr ->{
                         tracking = Tracking.ACTION
                     }
@@ -72,6 +75,9 @@ open class CameraBaseFragment : Fragment(), ICameraCallback {
                 when(checkedId){
                     R.id.none_sen ->{
                         sensitivity = PivoSensitivity.NONE
+                    }
+                    R.id.slower_sen ->{
+                        sensitivity = PivoSensitivity.SLOWER
                     }
                     R.id.slow_sen ->{
                         sensitivity = PivoSensitivity.SLOW
@@ -148,7 +154,12 @@ open class CameraBaseFragment : Fragment(), ICameraCallback {
             .setRotation(orientation)
             .build()
 
-        when(tracking){//person
+        when(tracking){
+            Tracking.FACE->{
+                PivoProSdk.getInstance().starFaceTracking(metadata, image, sensitivity, aiTrackerListener)
+                region = null
+                trackingStarted = true
+            }
             Tracking.PERSON->{
                 if (!trackingStarted){
                     PivoProSdk.getInstance().starPersonTracking(metadata, image, sensitivity , aiTrackerListener)
@@ -210,7 +221,12 @@ open class CameraBaseFragment : Fragment(), ICameraCallback {
             .setRotation(orientation)
             .build()
 
-        when(tracking){//person
+        when(tracking){
+            Tracking.FACE->{
+                PivoProSdk.getInstance().starFaceTracking(metadata, byteArray, sensitivity, aiTrackerListener)
+                region = null
+                trackingStarted = true
+            }
             Tracking.PERSON->{
                 if (!trackingStarted){
                     try {
@@ -295,19 +311,6 @@ open class CameraBaseFragment : Fragment(), ICameraCallback {
             val graphic = ActionGraphic(binding.trackingGraphicOverlay, rect)
             binding.trackingGraphicOverlay.add(graphic)
             binding.trackingGraphicOverlay.postInvalidate()
-        }
-
-        override fun onTracking(rect: Rect?) {
-            binding.trackingGraphicOverlay.clear()
-
-            if (rect!=null)
-            {
-                val graphic = ActionGraphic(binding.trackingGraphicOverlay, rect)
-                binding.trackingGraphicOverlay.add(graphic)
-                binding.trackingGraphicOverlay.postInvalidate()
-            }else{
-                Log.e("Camera", "update onTracking")
-            }
         }
 
         override fun onClear() {}

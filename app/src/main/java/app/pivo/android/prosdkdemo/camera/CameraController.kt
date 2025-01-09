@@ -19,7 +19,6 @@ import android.view.OrientationEventListener
 import android.view.Surface
 import android.view.TextureView
 import androidx.core.content.ContextCompat
-import app.pivo.android.prosdkdemo.util.ImageUtils
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -27,29 +26,16 @@ import java.lang.Long
 import java.util.*
 import java.util.concurrent.Semaphore
 import java.util.concurrent.TimeUnit
-import kotlin.Array
-import kotlin.Boolean
-import kotlin.ByteArray
-import kotlin.Comparator
-import kotlin.Double
-import kotlin.Int
-import kotlin.NullPointerException
-import kotlin.RuntimeException
-import kotlin.String
-import kotlin.Unit
-import kotlin.also
-import kotlin.apply
-import kotlin.let
+import kotlin.collections.ArrayList
 import kotlin.math.abs
 import kotlin.math.min
-import kotlin.with
 
 /**
  * Created by murodjon on 2020/04/10
  */
 class CameraController(
     private var context: Context,
-    private var listener:ICameraCallback,
+    private var listener: ICameraCallback,
     /**
      * An [AutoFitTextureView] for camera preview.
      */
@@ -118,7 +104,7 @@ class CameraController(
             cameraOpenCloseLock.release()
             cameraDevice = _cameraDevice
             createCameraPreviewSession()
-            listener.onCameraOpened()
+            listener?.onCameraOpened()
         }
 
         override fun onDisconnected(_cameraDevice: CameraDevice) {
@@ -129,7 +115,7 @@ class CameraController(
 
         override fun onError(cameraDevice: CameraDevice, error: Int) {
             onDisconnected(cameraDevice)
-            listener.onCameraError()
+            listener?.onCameraError()
         }
     }
 
@@ -176,14 +162,12 @@ class CameraController(
      * a frame is ready to process
      */
     private val onFrameAvailableListener = ImageReader.OnImageAvailableListener {
-        val image = it.acquireLatestImage() ?: return@OnImageAvailableListener
-
-        // note: Please use the below code to use image format api
-        //listener?.onProcessingFrame(image, frameSize!!.width, frameSize!!.height, getTrackingFrameRotation()/90, isFrontCamera())
-
-        // note: Please use the below code to use byteArray api
-        listener.onProcessingFrame(ImageUtils.convertYUV420888ToNV21(image)!!, frameSize!!.width, frameSize!!.height, getTrackingFrameRotation()/90, isFrontCamera())
-        image.close()
+        try {
+            val image = it.acquireLatestImage()?: return@OnImageAvailableListener
+            listener.onProcessingFrame(image, frameSize!!.width, frameSize!!.height, getTrackingFrameRotation()/90, isFrontCamera())
+        } catch (e: IllegalStateException) {
+            e.printStackTrace()
+        }
     }
 
     /**
@@ -488,9 +472,7 @@ class CameraController(
      */
     private fun startBackgroundThread() {
         backgroundThread = HandlerThread("CameraBackground").also { it.start() }
-        backgroundThread?.let {
-            backgroundHandler = Handler(it.looper)
-        }
+        backgroundHandler = backgroundThread?.looper?.let { Handler(it) }
     }
 
     /**
@@ -909,8 +891,8 @@ class CameraController(
     }
 
 
-    private val PHOTO_RATIO = 4.0 / 3.0
-    private val VIDEO_RATIO = 16.0 / 9.0
+    private val PHOTO_RATIO = 3.0 / 4.0
+    private val VIDEO_RATIO = 9.0 / 16.0
 
     /**
      * Added by Murodjon

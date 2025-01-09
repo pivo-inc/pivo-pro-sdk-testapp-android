@@ -37,9 +37,13 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".PivoControllerActivity"/>
+        <activity
+            android:name=".PivoControllerActivity"
+            android:exported="false" />
 
-        <activity android:name="app.pivo.android.prosdkdemo.CameraActivity"/>
+        <activity
+            android:name="app.pivo.android.prosdkdemo.CameraActivity"
+            android:exported="false" />
 
     </application>
 

@@ -14,12 +14,7 @@ class CameraActivity : AppCompatActivity() {
     }
 
     private fun setFragment() {
-        val cameraApi = intent.getIntExtra(PivoControllerActivity.CAMERA_TYPE_MSG_CODE, 1)
-        val fragment = if (cameraApi == 2) {
-            Camera2Fragment()
-        } else {
-            LegacyCameraFragment()
-        }
+        val fragment = Camera2Fragment()
         supportFragmentManager.beginTransaction().replace(R.id.container, fragment as Fragment).commit()
     }
 }
