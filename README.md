@@ -15,7 +15,7 @@ allprojects {
          mavenCentral()
     }
 ```
-2- In your app-level `build.gradle` file, add dependencies for PivoBasicSdk
+2- In your app-level `build.gradle` file, add dependencies for PivoBasicSdk and PivoProSdk
 
 ```groovy
 dependencies {
@@ -25,7 +25,7 @@ dependencies {
     implementation "app.pivo.android.basicsdk:basicsdk:1.3.6"
 
     /**
-     * Pivo Pro SDK dependencie
+     * Pivo Pro SDK dependencies
      */
     implementation "app.pivo.android.basicsdk:prosdk:1.3.4"
 
