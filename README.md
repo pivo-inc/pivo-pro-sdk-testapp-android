@@ -27,7 +27,7 @@ dependencies {
     /**
      * Pivo Pro SDK dependencie
      */
-    implementation "app.pivo.android.basicsdk:prosdk:1.3.3"
+    implementation "app.pivo.android.basicsdk:prosdk:1.3.4"
 
     /**
      * Tensorflow module
@@ -108,6 +108,31 @@ if (region!=null && !trackingStarted){
 }
 ```
 
+### Person/Face Tracking:
+
+```kotlin
+override fun onProcessingFrame (image: Image, width:Int, height:Int,
+ orientation:Int, frontCamera:Boolean) {
+//...
+  PivoProSdk.getInstance().startFaceTracking(metadata, image,sensitivity, aiTrackerListener) // For face tracking
+  region = null
+  trackingStarted = true
+//...
+}
+```
+or
+
+```kotlin
+override fun onProcessingFrame (image: ByteArray, width:Int, height:Int,
+ orientation:Int, frontCamera:Boolean) {
+//...
+  PivoProSdk.getInstance().startFaceTracking(metadata, image,sensitivity, aiTrackerListener) // For horse tracking
+  region = null
+  trackingStarted = true
+//...
+}
+```
+
 ### Person/Horse Tracking:
 
 ```kotlin
@@ -115,7 +140,6 @@ override fun onProcessingFrame (image: Image, width:Int, height:Int,
  orientation:Int, frontCamera:Boolean) {
 //...
 if (!trackingStarted){
-//PivoProSdk.getInstance().starPersonTracking(metadata, image, sensitivity , aiTrackerListener) // For person tracking
   PivoProSdk.getInstance().startHorseTracking(metadata, image,sensitivity, aiTrackerListener) // For horse tracking
   region = null
   trackingStarted = true

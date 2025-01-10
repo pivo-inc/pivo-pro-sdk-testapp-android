@@ -156,13 +156,13 @@ open class CameraBaseFragment : Fragment(), ICameraCallback {
 
         when(tracking){
             Tracking.FACE->{
-                PivoProSdk.getInstance().starFaceTracking(metadata, image, sensitivity, aiTrackerListener)
+                PivoProSdk.getInstance().startFaceTracking(metadata, image, sensitivity, aiTrackerListener)
                 region = null
                 trackingStarted = true
             }
             Tracking.PERSON->{
                 if (!trackingStarted){
-                    PivoProSdk.getInstance().starPersonTracking(metadata, image, sensitivity , aiTrackerListener)
+                    PivoProSdk.getInstance().startPersonTracking(metadata, image, sensitivity , aiTrackerListener)
                     trackingStarted = true
                 }else{
                     PivoProSdk.getInstance().updateTrackingFrame(image, metadata)
@@ -223,14 +223,14 @@ open class CameraBaseFragment : Fragment(), ICameraCallback {
 
         when(tracking){
             Tracking.FACE->{
-                PivoProSdk.getInstance().starFaceTracking(metadata, byteArray, sensitivity, aiTrackerListener)
+                PivoProSdk.getInstance().startFaceTracking(metadata, byteArray, sensitivity, aiTrackerListener)
                 region = null
                 trackingStarted = true
             }
             Tracking.PERSON->{
                 if (!trackingStarted){
                     try {
-                        PivoProSdk.getInstance().starPersonTracking(metadata, byteArray, sensitivity , aiTrackerListener)
+                        PivoProSdk.getInstance().startPersonTracking(metadata, byteArray, sensitivity , aiTrackerListener)
                     } catch (e: Exception) {
                         Log.e("aa", "${e.message}")
                     }
