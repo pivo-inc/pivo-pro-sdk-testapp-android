@@ -7,8 +7,10 @@ import android.widget.AdapterView
 import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatActivity
+import app.pivo.android.basicsdk.PivoSdk
 import app.pivo.android.basicsdk.events.PivoEvent
 import app.pivo.android.basicsdk.events.PivoEventBus
+import app.pivo.android.basicsdk.util.RemoteControlMode
 import app.pivo.android.prosdk.PivoProSdk
 import app.pivo.android.prosdkdemo.databinding.ActivityPivoControllerBinding
 import io.reactivex.functions.Consumer
@@ -19,6 +21,7 @@ class PivoControllerActivity : AppCompatActivity() {
     private val TAG = "PivoControllerActivity"
 
     private lateinit var binding: ActivityPivoControllerBinding
+    private var enableRemoteController = false
 
     companion object{
         val CAMERA_TYPE_MSG_CODE = "CAMERA_TYPE_MSG_CODE"
@@ -26,7 +29,6 @@ class PivoControllerActivity : AppCompatActivity() {
 
     private var rotationSpeedPosition=0
     private var remoteSpeedPosition=0
-    private var enableBypass = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -84,8 +86,12 @@ class PivoControllerActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+        /**
+         * Toggle remote controller mode (enable/disable)
+         * Result will be returned via PivoEventBus.REMOTE_CONTROLLER_MODE as PivoEvent.RemoteControllerState
+         * */
         binding.btnEnbaleBypass.setOnClickListener {
-            PivoProSdk.getInstance().enableBypass(!enableBypass)
+            PivoSdk.getInstance().enableRemoteController(if (enableRemoteController) RemoteControlMode.DISABLED else RemoteControlMode.ENABLED)
         }
 
 //        // get mac address
@@ -127,13 +133,13 @@ class PivoControllerActivity : AppCompatActivity() {
         PivoEventBus.subscribe(
             PivoEventBus.REMOTE_CONTROLLER, this, Consumer {
                 when(it){
-                    is PivoEvent.RCCamera->binding.notificationView.text = "CAMERA state: ${if(it.state==0)"Press" else "Release"}"
-                    is PivoEvent.RCMode->binding.notificationView.text = "MODE: ${if(it.state==0)"Press" else "Release"}"
-                    is PivoEvent.RCStop->binding.notificationView.text = "STOP: ${if(it.state==0)"Press" else "Release"}"
-                    is PivoEvent.RCRightContinuous->binding.notificationView.text = "RIGHT_CONTINUOUS: ${if(it.state==0)"Press" else "Release"}"
-                    is PivoEvent.RCLeftContinuous->binding.notificationView.text = "LEFT_CONTINUOUS: ${if(it.state==0)"Press" else "Release"}"
-                    is PivoEvent.RCLeft->binding.notificationView.text = "LEFT: ${if(it.state==0)"Press" else "Release"}"
-                    is PivoEvent.RCRight->binding.notificationView.text = "RIGHT: ${if(it.state==0)"Press" else "Release"}"
+                    is PivoEvent.RCCamera->binding.notificationView.text = "CAMERA state: ${if(it.state==0)"Release" else "Press"}"
+                    is PivoEvent.RCMode->binding.notificationView.text = "MODE: ${if(it.state==0)"Release" else "Press"}"
+                    is PivoEvent.RCStop->binding.notificationView.text = "STOP: ${if(it.state==0)"Release" else "Press"}"
+                    is PivoEvent.RCRightContinuous->binding.notificationView.text = "RIGHT_CONTINUOUS: ${if(it.state==0)"Release" else "Press"}"
+                    is PivoEvent.RCLeftContinuous->binding.notificationView.text = "LEFT_CONTINUOUS: ${if(it.state==0)"Release" else "Press"}"
+                    is PivoEvent.RCLeft->binding.notificationView.text = "LEFT: ${if(it.state==0)"Release" else "Press"}"
+                    is PivoEvent.RCRight->binding.notificationView.text = "RIGHT: ${if(it.state==0)"Release" else "Press"}"
 
                     /**
                      * This below events're deprecated
@@ -148,7 +154,7 @@ class PivoControllerActivity : AppCompatActivity() {
                     is PivoEvent.RCSpeedDownRelease->binding.notificationView.text = "SPEED_DOWN_RELEASE: ${it.level}"
                      */
 
-                    is PivoEvent.RCSpeed->binding.notificationView.text = "SPEED: : ${if(it.state==0)"Press" else "Release"} speed: ${it.level}"
+                    is PivoEvent.RCSpeed->binding.notificationView.text = "SPEED: : ${if(it.state==0)"Release" else "Press"} speed: ${it.level}"
                 }
             })
         //subscribe to name change event
@@ -177,13 +183,22 @@ class PivoControllerActivity : AppCompatActivity() {
                 }
             })
 
-        PivoEventBus.subscribe(
-            PivoEventBus.BYPASS, this, Consumer {
-                if(it is PivoEvent.BypassEvent) {
-                    enableBypass = it.isEnabled
-                    binding.btnEnbaleBypass.text = if(it.isEnabled) getString(R.string.disable_bypass) else getString(R.string.enable_bypass)
+
+        /**
+         * Subscribe to Remote Controller Mode
+         * This event is triggered when the remote controller mode is changed.
+         * */
+        PivoEventBus.subscribe(PivoEventBus.REMOTE_CONTROLLER_MODE, this) {
+            if (it is PivoEvent.RemoteControllerState) {
+                enableRemoteController = it.mode == RemoteControlMode.ENABLED
+                val remoteControllerText = if (enableRemoteController) {
+                    getString(R.string.disable_bypass)
+                } else {
+                    getString(R.string.enable_bypass)
                 }
-            })
+                binding.btnEnbaleBypass.text = remoteControllerText
+            }
+        }
     }
 
     private fun getAngle():Int{
