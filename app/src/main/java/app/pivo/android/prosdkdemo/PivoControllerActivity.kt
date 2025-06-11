@@ -133,13 +133,13 @@ class PivoControllerActivity : AppCompatActivity() {
         PivoEventBus.subscribe(
             PivoEventBus.REMOTE_CONTROLLER, this, Consumer {
                 when(it){
-                    is PivoEvent.RCCamera->binding.notificationView.text = "CAMERA state: ${if(it.state==0)"Press" else "Release"}"
-                    is PivoEvent.RCMode->binding.notificationView.text = "MODE: ${if(it.state==0)"Press" else "Release"}"
-                    is PivoEvent.RCStop->binding.notificationView.text = "STOP: ${if(it.state==0)"Press" else "Release"}"
-                    is PivoEvent.RCRightContinuous->binding.notificationView.text = "RIGHT_CONTINUOUS: ${if(it.state==0)"Press" else "Release"}"
-                    is PivoEvent.RCLeftContinuous->binding.notificationView.text = "LEFT_CONTINUOUS: ${if(it.state==0)"Press" else "Release"}"
-                    is PivoEvent.RCLeft->binding.notificationView.text = "LEFT: ${if(it.state==0)"Press" else "Release"}"
-                    is PivoEvent.RCRight->binding.notificationView.text = "RIGHT: ${if(it.state==0)"Press" else "Release"}"
+                    is PivoEvent.RCCamera->binding.notificationView.text = "CAMERA state: ${if(it.state==0)"Release" else "Press"}"
+                    is PivoEvent.RCMode->binding.notificationView.text = "MODE: ${if(it.state==0)"Release" else "Press"}"
+                    is PivoEvent.RCStop->binding.notificationView.text = "STOP: ${if(it.state==0)"Release" else "Press"}"
+                    is PivoEvent.RCRightContinuous->binding.notificationView.text = "RIGHT_CONTINUOUS: ${if(it.state==0)"Release" else "Press"}"
+                    is PivoEvent.RCLeftContinuous->binding.notificationView.text = "LEFT_CONTINUOUS: ${if(it.state==0)"Release" else "Press"}"
+                    is PivoEvent.RCLeft->binding.notificationView.text = "LEFT: ${if(it.state==0)"Release" else "Press"}"
+                    is PivoEvent.RCRight->binding.notificationView.text = "RIGHT: ${if(it.state==0)"Release" else "Press"}"
 
                     /**
                      * This below events're deprecated
@@ -154,7 +154,7 @@ class PivoControllerActivity : AppCompatActivity() {
                     is PivoEvent.RCSpeedDownRelease->binding.notificationView.text = "SPEED_DOWN_RELEASE: ${it.level}"
                      */
 
-                    is PivoEvent.RCSpeed->binding.notificationView.text = "SPEED: : ${if(it.state==0)"Press" else "Release"} speed: ${it.level}"
+                    is PivoEvent.RCSpeed->binding.notificationView.text = "SPEED: : ${if(it.state==0)"Release" else "Press"} speed: ${it.level}"
                 }
             })
         //subscribe to name change event
