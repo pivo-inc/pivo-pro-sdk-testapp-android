@@ -7,8 +7,10 @@ import android.widget.AdapterView
 import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatActivity
+import app.pivo.android.basicsdk.PivoSdk
 import app.pivo.android.basicsdk.events.PivoEvent
 import app.pivo.android.basicsdk.events.PivoEventBus
+import app.pivo.android.basicsdk.util.RemoteControlMode
 import app.pivo.android.prosdk.PivoProSdk
 import app.pivo.android.prosdkdemo.databinding.ActivityPivoControllerBinding
 import io.reactivex.functions.Consumer
@@ -19,6 +21,7 @@ class PivoControllerActivity : AppCompatActivity() {
     private val TAG = "PivoControllerActivity"
 
     private lateinit var binding: ActivityPivoControllerBinding
+    private var enableRemoteController = false
 
     companion object{
         val CAMERA_TYPE_MSG_CODE = "CAMERA_TYPE_MSG_CODE"
@@ -26,7 +29,6 @@ class PivoControllerActivity : AppCompatActivity() {
 
     private var rotationSpeedPosition=0
     private var remoteSpeedPosition=0
-    private var enableBypass = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -84,8 +86,12 @@ class PivoControllerActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+        /**
+         * Toggle remote controller mode (enable/disable)
+         * Result will be returned via PivoEventBus.REMOTE_CONTROLLER_MODE as PivoEvent.RemoteControllerState
+         * */
         binding.btnEnbaleBypass.setOnClickListener {
-            PivoProSdk.getInstance().enableBypass(!enableBypass)
+            PivoSdk.getInstance().enableRemoteController(if (enableRemoteController) RemoteControlMode.DISABLED else RemoteControlMode.ENABLED)
         }
 
 //        // get mac address
@@ -177,13 +183,22 @@ class PivoControllerActivity : AppCompatActivity() {
                 }
             })
 
-        PivoEventBus.subscribe(
-            PivoEventBus.BYPASS, this, Consumer {
-                if(it is PivoEvent.BypassEvent) {
-                    enableBypass = it.isEnabled
-                    binding.btnEnbaleBypass.text = if(it.isEnabled) getString(R.string.disable_bypass) else getString(R.string.enable_bypass)
+
+        /**
+         * Subscribe to Remote Controller Mode
+         * This event is triggered when the remote controller mode is changed.
+         * */
+        PivoEventBus.subscribe(PivoEventBus.REMOTE_CONTROLLER_MODE, this) {
+            if (it is PivoEvent.RemoteControllerState) {
+                enableRemoteController = it.mode == RemoteControlMode.ENABLED
+                val remoteControllerText = if (enableRemoteController) {
+                    getString(R.string.disable_bypass)
+                } else {
+                    getString(R.string.enable_bypass)
                 }
-            })
+                binding.btnEnbaleBypass.text = remoteControllerText
+            }
+        }
     }
 
     private fun getAngle():Int{
