@@ -305,7 +305,7 @@
 
     <Button
         android:id="@+id/btn_enbale_bypass"
-        android:text="@string/enable_bypass"
+        android:text="@string/disable_remote_control"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="@id/left_guideline"

@@ -192,9 +192,9 @@ class PivoControllerActivity : AppCompatActivity() {
             if (it is PivoEvent.RemoteControllerState) {
                 enableRemoteController = it.mode == RemoteControlMode.ENABLED
                 val remoteControllerText = if (enableRemoteController) {
-                    getString(R.string.disable_bypass)
+                    getString(R.string.disable_remote_control)
                 } else {
-                    getString(R.string.enable_bypass)
+                    getString(R.string.enable_remote_control)
                 }
                 binding.btnEnbaleBypass.text = remoteControllerText
             }

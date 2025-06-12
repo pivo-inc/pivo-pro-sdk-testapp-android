@@ -33,6 +33,6 @@
     <string name="camera">Go camera</string>
     <string name="camera1">Go camera 1</string>
     <string name="camera2">Go camera 2</string>
-    <string name="enable_bypass">Disable Remote Control</string>
-    <string name="disable_bypass">Enable Remote Control</string>
+    <string name="disable_remote_control">Disable Remote Control</string>
+    <string name="enable_remote_control">Enable Remote Control</string>
 </resources>
