@@ -27,7 +27,7 @@ dependencies {
     /**
      * Pivo Pro SDK dependencies
      */
-    implementation "app.pivo.android.basicsdk:prosdk:1.3.4"
+    implementation "app.pivo.android.basicsdk:prosdk:1.3.5"
 
     /**
      * Tensorflow module
